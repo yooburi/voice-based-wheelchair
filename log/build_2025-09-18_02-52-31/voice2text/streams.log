@@ -1,0 +1,19 @@
+[0.711s] Invoking command in '/home/yoo/workspace/dolchair_ws/build/voice2text': PYTHONPATH=/home/yoo/workspace/dolchair_ws/build/voice2text/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/yoo/workspace/dolchair_ws/build/voice2text/build --no-deps symlink_data --force
+[0.925s] running develop
+[1.095s] running egg_info
+[1.095s] writing voice2text.egg-info/PKG-INFO
+[1.095s] writing dependency_links to voice2text.egg-info/dependency_links.txt
+[1.095s] writing entry points to voice2text.egg-info/entry_points.txt
+[1.095s] writing requirements to voice2text.egg-info/requires.txt
+[1.095s] writing top-level names to voice2text.egg-info/top_level.txt
+[1.097s] reading manifest file 'voice2text.egg-info/SOURCES.txt'
+[1.097s] writing manifest file 'voice2text.egg-info/SOURCES.txt'
+[1.099s] running build_ext
+[1.099s] Creating /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text.egg-link (link to .)
+[1.099s] Installing voice2text script to /home/yoo/workspace/dolchair_ws/install/voice2text/lib/voice2text
+[1.099s] 
+[1.099s] Installed /home/yoo/workspace/dolchair_ws/build/voice2text
+[1.100s] running symlink_data
+[1.100s] symbolically linking /home/yoo/workspace/dolchair_ws/build/voice2text/resource/voice2text -> /home/yoo/workspace/dolchair_ws/install/voice2text/share/ament_index/resource_index/packages
+[1.100s] symbolically linking /home/yoo/workspace/dolchair_ws/build/voice2text/package.xml -> /home/yoo/workspace/dolchair_ws/install/voice2text/share/voice2text
+[1.135s] Invoked command in '/home/yoo/workspace/dolchair_ws/build/voice2text' returned '0': PYTHONPATH=/home/yoo/workspace/dolchair_ws/build/voice2text/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/yoo/workspace/dolchair_ws/build/voice2text/build --no-deps symlink_data --force

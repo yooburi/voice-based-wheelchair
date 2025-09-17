@@ -1,0 +1,19 @@
+running egg_info
+writing ../../build/llm_ros/llm_ros.egg-info/PKG-INFO
+writing dependency_links to ../../build/llm_ros/llm_ros.egg-info/dependency_links.txt
+writing entry points to ../../build/llm_ros/llm_ros.egg-info/entry_points.txt
+writing requirements to ../../build/llm_ros/llm_ros.egg-info/requires.txt
+writing top-level names to ../../build/llm_ros/llm_ros.egg-info/top_level.txt
+reading manifest file '../../build/llm_ros/llm_ros.egg-info/SOURCES.txt'
+writing manifest file '../../build/llm_ros/llm_ros.egg-info/SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+running install_data
+running install_egg_info
+removing '/home/yoo/workspace/dolchair_ws/install/llm_ros/lib/python3.10/site-packages/llm_ros-0.0.0-py3.10.egg-info' (and everything under it)
+Copying ../../build/llm_ros/llm_ros.egg-info to /home/yoo/workspace/dolchair_ws/install/llm_ros/lib/python3.10/site-packages/llm_ros-0.0.0-py3.10.egg-info
+running install_scripts
+Installing filter_input_text script to /home/yoo/workspace/dolchair_ws/install/llm_ros/lib/llm_ros
+writing list of installed files to '/home/yoo/workspace/dolchair_ws/build/llm_ros/install.log'

@@ -1,0 +1,3 @@
+[console_scripts]
+voice2text = voice2text.voice2text:main
+

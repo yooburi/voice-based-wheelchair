@@ -1,0 +1,35 @@
+running egg_info
+creating ../../build/voice2text/voice2text.egg-info
+writing ../../build/voice2text/voice2text.egg-info/PKG-INFO
+writing dependency_links to ../../build/voice2text/voice2text.egg-info/dependency_links.txt
+writing entry points to ../../build/voice2text/voice2text.egg-info/entry_points.txt
+writing requirements to ../../build/voice2text/voice2text.egg-info/requires.txt
+writing top-level names to ../../build/voice2text/voice2text.egg-info/top_level.txt
+writing manifest file '../../build/voice2text/voice2text.egg-info/SOURCES.txt'
+reading manifest file '../../build/voice2text/voice2text.egg-info/SOURCES.txt'
+writing manifest file '../../build/voice2text/voice2text.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/yoo/workspace/dolchair_ws/build/voice2text/build
+creating /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib
+creating /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib/voice2text
+copying voice2text/voice2text.py -> /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib/voice2text
+copying voice2text/__init__.py -> /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib/voice2text
+running install
+running install_lib
+creating /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text
+copying /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib/voice2text/voice2text.py -> /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text
+copying /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib/voice2text/__init__.py -> /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text
+byte-compiling /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text/voice2text.py to voice2text.cpython-310.pyc
+byte-compiling /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /home/yoo/workspace/dolchair_ws/install/voice2text/share/ament_index
+creating /home/yoo/workspace/dolchair_ws/install/voice2text/share/ament_index/resource_index
+creating /home/yoo/workspace/dolchair_ws/install/voice2text/share/ament_index/resource_index/packages
+copying resource/voice2text -> /home/yoo/workspace/dolchair_ws/install/voice2text/share/ament_index/resource_index/packages
+copying package.xml -> /home/yoo/workspace/dolchair_ws/install/voice2text/share/voice2text
+running install_egg_info
+Copying ../../build/voice2text/voice2text.egg-info to /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text-0.0.0-py3.10.egg-info
+running install_scripts
+Installing voice2text script to /home/yoo/workspace/dolchair_ws/install/voice2text/lib/voice2text
+writing list of installed files to '/home/yoo/workspace/dolchair_ws/build/voice2text/install.log'

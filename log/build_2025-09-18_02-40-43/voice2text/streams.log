@@ -1,0 +1,24 @@
+[0.736s] Invoking command in '/home/yoo/workspace/dolchair_ws/src/voice2text': PYTHONPATH=/home/yoo/workspace/dolchair_ws/build/voice2text/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/voice2text build --build-base /home/yoo/workspace/dolchair_ws/build/voice2text/build install --record /home/yoo/workspace/dolchair_ws/build/voice2text/install.log --single-version-externally-managed install_data
+[0.948s] running egg_info
+[0.948s] writing ../../build/voice2text/voice2text.egg-info/PKG-INFO
+[0.949s] writing dependency_links to ../../build/voice2text/voice2text.egg-info/dependency_links.txt
+[0.949s] writing entry points to ../../build/voice2text/voice2text.egg-info/entry_points.txt
+[0.949s] writing requirements to ../../build/voice2text/voice2text.egg-info/requires.txt
+[0.949s] writing top-level names to ../../build/voice2text/voice2text.egg-info/top_level.txt
+[0.950s] reading manifest file '../../build/voice2text/voice2text.egg-info/SOURCES.txt'
+[0.950s] writing manifest file '../../build/voice2text/voice2text.egg-info/SOURCES.txt'
+[0.951s] running build
+[0.951s] running build_py
+[0.951s] copying voice2text/voice2text.py -> /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib/voice2text
+[0.951s] running install
+[0.952s] running install_lib
+[0.952s] copying /home/yoo/workspace/dolchair_ws/build/voice2text/build/lib/voice2text/voice2text.py -> /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text
+[0.952s] byte-compiling /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text/voice2text.py to voice2text.cpython-310.pyc
+[0.954s] running install_data
+[0.954s] running install_egg_info
+[0.955s] removing '/home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text-0.0.0-py3.10.egg-info' (and everything under it)
+[0.955s] Copying ../../build/voice2text/voice2text.egg-info to /home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages/voice2text-0.0.0-py3.10.egg-info
+[0.956s] running install_scripts
+[0.969s] Installing voice2text script to /home/yoo/workspace/dolchair_ws/install/voice2text/lib/voice2text
+[0.970s] writing list of installed files to '/home/yoo/workspace/dolchair_ws/build/voice2text/install.log'
+[0.996s] Invoked command in '/home/yoo/workspace/dolchair_ws/src/voice2text' returned '0': PYTHONPATH=/home/yoo/workspace/dolchair_ws/build/voice2text/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/yoo/workspace/dolchair_ws/install/voice2text/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/voice2text build --build-base /home/yoo/workspace/dolchair_ws/build/voice2text/build install --record /home/yoo/workspace/dolchair_ws/build/voice2text/install.log --single-version-externally-managed install_data

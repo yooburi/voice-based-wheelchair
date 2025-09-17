@@ -1,0 +1,21 @@
+[0.730s] Invoking command in '/home/yoo/workspace/dolchair_ws/src/llm_ros': PYTHONPATH=/home/yoo/workspace/dolchair_ws/build/llm_ros/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/yoo/workspace/dolchair_ws/install/llm_ros/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/llm_ros build --build-base /home/yoo/workspace/dolchair_ws/build/llm_ros/build install --record /home/yoo/workspace/dolchair_ws/build/llm_ros/install.log --single-version-externally-managed install_data
+[0.926s] running egg_info
+[0.927s] writing ../../build/llm_ros/llm_ros.egg-info/PKG-INFO
+[0.927s] writing dependency_links to ../../build/llm_ros/llm_ros.egg-info/dependency_links.txt
+[0.927s] writing entry points to ../../build/llm_ros/llm_ros.egg-info/entry_points.txt
+[0.927s] writing requirements to ../../build/llm_ros/llm_ros.egg-info/requires.txt
+[0.927s] writing top-level names to ../../build/llm_ros/llm_ros.egg-info/top_level.txt
+[0.928s] reading manifest file '../../build/llm_ros/llm_ros.egg-info/SOURCES.txt'
+[0.929s] writing manifest file '../../build/llm_ros/llm_ros.egg-info/SOURCES.txt'
+[0.929s] running build
+[0.929s] running build_py
+[0.929s] running install
+[0.930s] running install_lib
+[0.930s] running install_data
+[0.930s] running install_egg_info
+[0.932s] removing '/home/yoo/workspace/dolchair_ws/install/llm_ros/lib/python3.10/site-packages/llm_ros-0.0.0-py3.10.egg-info' (and everything under it)
+[0.932s] Copying ../../build/llm_ros/llm_ros.egg-info to /home/yoo/workspace/dolchair_ws/install/llm_ros/lib/python3.10/site-packages/llm_ros-0.0.0-py3.10.egg-info
+[0.933s] running install_scripts
+[0.947s] Installing filter_input_text script to /home/yoo/workspace/dolchair_ws/install/llm_ros/lib/llm_ros
+[0.947s] writing list of installed files to '/home/yoo/workspace/dolchair_ws/build/llm_ros/install.log'
+[0.984s] Invoked command in '/home/yoo/workspace/dolchair_ws/src/llm_ros' returned '0': PYTHONPATH=/home/yoo/workspace/dolchair_ws/build/llm_ros/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/yoo/workspace/dolchair_ws/install/llm_ros/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/llm_ros build --build-base /home/yoo/workspace/dolchair_ws/build/llm_ros/build install --record /home/yoo/workspace/dolchair_ws/build/llm_ros/install.log --single-version-externally-managed install_data
