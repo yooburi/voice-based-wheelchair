@@ -1,3 +1,0 @@
-[console_scripts]
-filter_input_text = llm_ros.filter_input_text:main
-
