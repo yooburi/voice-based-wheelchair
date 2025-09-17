@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# /text_command 구독 → LLM에 질의 → /voice_cmd 퍼블리시
+
 import os
 import json
 

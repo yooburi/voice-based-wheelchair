@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'filter_input_text = llm_ros.filter_input_text:main',
             'llm_node = llm_ros.llm_node:main',
+            'location_command = llm_ros.location_command:main',
         ],
     },
 )
