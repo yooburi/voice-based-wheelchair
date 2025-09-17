@@ -1,0 +1,141 @@
+########################################
+# OS / 에디터 공통
+########################################
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# VSCode / JetBrains (CLion, PyCharm 등)
+.vscode/
+.idea/
+*.iml
+
+########################################
+# ROS2 / colcon / ament
+########################################
+# 루트(workspace)와 패키지 하위 공통
+build/
+install/
+log/
+.colcon/
+**/build/
+**/install/
+**/log/
+**/.colcon/
+
+# ament/colcon 보조 파일
+**/AMENT_IGNORE
+**/.ament*
+**/.cache/
+
+########################################
+# CMake / 빌드 산출물
+########################################
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+# 오브젝트/라이브러리
+*.o
+*.obj
+*.a
+*.la
+*.lo
+*.so
+*.dylib
+*.dll
+*.lib
+*.exe
+*.out
+
+########################################
+# Python
+########################################
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+########################################
+# 테스트/로그/리플레이(대용량)
+########################################
+# rosbag2 (sqlite3)
+**/*.db3
+# mcap, bag, 기타
+**/*.mcap
+**/*.bag
+# 센서/디버그 로그
+**/logs/
+**/*.log
+**/recordings/
+# ros2 trace
+**/trace/
+**/*.ctf
+
+########################################
+# 맵/SLAM/내비게이션 산출물(필요 시만 추적)
+########################################
+# nav2 지도 산출물
+**/maps/**/*.pgm
+**/maps/**/*.yaml
+**/maps/**/*.png
+# occupancy/grid 저장 등
+**/maps/**/map*.*
+# cartographer, slam_toolbox 등 중간파일
+**/slam_temp/
+**/trajectory_nodes/
+**/submaps/
+
+########################################
+# RViz / 시각화 캐시
+########################################
+**/*.rviz~
+**/.rviz2/
+
+########################################
+# 데이터/모델(별도 저장소 권장)
+########################################
+data/
+datasets/
+dataset/
+**/cache/
+**/tmp/
+# DL/추론 가중치
+*.pt
+*.pth
+*.onnx
+*.engine
+*.plan
+*.tflite
+*.ckpt
+*.safetensors
+# 실행 결과
+runs/
+results/
+outputs/
+
+########################################
+# 보안/환경 파일
+########################################
+*.env
+.env.*
+*.pem
+*.key
+*.cert
+*secret*.json
+
+########################################
+# 예외(꼭 추적할 샘플/문서만 허용)
+########################################
+!docs/**/*
+!examples/**/*
