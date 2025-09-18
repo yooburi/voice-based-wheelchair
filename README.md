@@ -7,7 +7,7 @@
 
 - 정적 TF 발행 & 맵 생성 및 저장
   
-1. ros2 run robot_state_publisher robot_state_publisher --ros-args -p robot_description:="$(cat src/rf2o_laser_odometry/urdf/rplidar_myahrs.urdf)"
+1. ros2 run robot_state_publisher robot_state_publisher --ros-args -p robot_description:="$(cat src/2D_LiDAR/wheelchair_slam_bringup/urdf/rplidar_myahrs.urdf)"
 2. ros2 launch sllidar_ros2 view_sllidar_a2m8_launch.py
-3. ros2 launch rf20_laser_odometry rf2o_laser_odometry.launch.py
-4. ros2 launch slam_toolbox online_async_launch.py slam_params_file:="$(cat src/wheelchair_slam_bringup/urdf/rplidar_myahrs.urdf)"
+3. ros2 launch rf2o_laser_odometry rf2o_laser_odometry.launch.py
+4. ros2 launch slam_toolbox online_async_launch.py slam_params_file:="$(cat src/2D_LiDAR/wheelchair_slam_bringup/config/slam.yaml)"

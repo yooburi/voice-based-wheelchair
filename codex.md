@@ -7,4 +7,4 @@ src/llm_ros/llm_ros/location_command.py 코드에서 발행되는 /location_targ
 
 2. path_planning 노드를 작성하여 /location_target을 subscribe 받아서 일치되는 라벨 + 맵 상에서 현재 자기의 위치를 localization하여 일직선으로 연결.
 
-3. 주행 및 조향 명령. 속도는 일정하게. 
+3. 주행 및 조향 명령. 속도는 일정하게.
