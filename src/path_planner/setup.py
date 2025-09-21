@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'make_pathnplan = path_planner.make_pathnplan:main',
         ],
     },
 )

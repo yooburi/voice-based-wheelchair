@@ -1,0 +1,9 @@
+labels:
+  toilet:
+    x: 1.0
+    y: 2.0
+    yaw: 1.5708  # optional, radians; facing +y
+  door:
+    x: -0.5
+    y: 0.8
+    yaw: 0.0     # optional; facing +x
