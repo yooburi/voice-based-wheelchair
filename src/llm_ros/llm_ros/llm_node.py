@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# /text_command 구독 → LLM에 질의 → /voice_cmd 퍼블리시
+# /text_to_llm 구독 → LLM에 질의 → /voice_cmd 퍼블리시
 
 import os
 import json
@@ -10,13 +10,14 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 
+# 호출 단어 제거 로직은 IntentRouter로 이전되었습니다.
 
 class LLMNode(Node):
     def __init__(self):
         super().__init__('llm_node')
 
         # 파라미터: 구독/퍼블리시 토픽명 (필요 시 변경 가능)
-        self.in_topic = self.declare_parameter('in_topic', '/text_command') \
+        self.in_topic = self.declare_parameter('in_topic', '/text_to_llm') \
             .get_parameter_value().string_value
         self.out_topic = self.declare_parameter('out_topic', '/voice_cmd') \
             .get_parameter_value().string_value
@@ -46,9 +47,15 @@ class LLMNode(Node):
         )
 
     def _on_command(self, msg: String):
-        text = msg.data
-        self.get_logger().info(f"수신: {text}")
-        json_result = self._ask_gpt(text)
+        # IntentRouter가 호출 단어를 이미 제거했으므로, 받은 데이터를 그대로 사용합니다.
+        clean_text = msg.data
+        self.get_logger().info(f"수신: {clean_text}")
+
+        if not clean_text:
+            self.get_logger().warn("빈 명령을 수신하여 무시합니다.")
+            return
+
+        json_result = self._ask_gpt(clean_text)
         if json_result:
             out = String()
             out.data = json_result
@@ -69,30 +76,35 @@ class LLMNode(Node):
 
         prompt = f'''
 You are a robot that provides only JSON as a response.
-Consider the following ontology:
+Do not include explanations, only valid JSON.
+
+Ontology:
 {{
     "action": "move",
     "params": {{
-        "linear_speed": "a float number",
-        "distance": "a float number",
-        "is_forward": "a boolean"
+        "linear_speed": float,
+        "distance": float,
+        "is_forward": bool
     }}
 }},
 {{
     "action": "rotate",
     "params": {{
-        "angular_velocity": "a float number, degrees per second",
-        "is_clockwise": "a boolean"
+        "angular_velocity": float,
+        "is_clockwise": bool
     }}
 }}
-The user will provide a prompt and you will return a JSON response with the parsed action and parameters.
 
+The user will provide a prompt and you will return ONLY a JSON response.
+
+Example:
 prompt: "앞으로 1미터 가줘"
-returns: {{"action": "move", "params": {{"linear_speed": 0.2, "distance": 1.0, "is_forward": true}}}}
+returns: {{"action": "move", "params": {{"linear_speed": 0.2, "distance": 1.0, "is_forward": true}}}} 
 
 prompt: "시계 방향으로 90도 회전해줘"
-returns: {{"action": "rotate", "params": {{"angular_velocity": 90.0, "is_clockwise": true}}}}
+returns: {{"action": "rotate", "params": {{"angular_velocity": 90.0, "is_clockwise": true}}}} 
 
+Now process:
 prompt: "{text_command}"
 returns:
 '''
@@ -136,3 +148,5 @@ def main(args=None):
         node.destroy_node()
         rclpy.shutdown()
 
+if __name__ == '__main__':
+    main()
