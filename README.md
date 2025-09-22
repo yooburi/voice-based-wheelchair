@@ -1,6 +1,7 @@
 # VOICE_BASED_WHEELCHAIR
 ---
-## 목적:
+### 목적
+전신마비 장애인의 자율적인 이동을 지원하기 위한 음성 기반 전동휠체어 제어 시스템을 개발 
 
 ---
 ### 실행 명령어 정리 
@@ -29,9 +30,10 @@
 1. ros2 run path_planner make_pathnplan
 2. ros2 run path_planner path_follower
 ---
-**rqt graph**
+### rqt graph
 ![alt text](image-1.png)
 
+---
 
 ### 2025-09-21: 명령어 처리 아키텍처 개선
 
