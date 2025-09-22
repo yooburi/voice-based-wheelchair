@@ -123,6 +123,8 @@ dataset/
 runs/
 results/
 outputs/
+codex.md
+GEMINI.md
 
 ########################################
 # 보안/환경 파일
