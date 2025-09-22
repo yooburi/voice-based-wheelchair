@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+import os
 from typing import Dict, Optional, Tuple
 
 import rclpy
@@ -15,6 +16,10 @@ from nav_msgs.msg import Path
 
 import tf2_ros
 import yaml
+try:
+    from ament_index_python.packages import get_package_share_directory  # type: ignore
+except Exception:
+    get_package_share_directory = None  # type: ignore
 
 
 def yaw_to_quaternion(yaw: float):
@@ -58,11 +63,32 @@ class StraightPathPlanner(Node):
         )
 
     def _load_locations(self):
+        yaml_path = self.location_yaml
+        # If not absolute or not exists, try package share path
+        if not os.path.isabs(yaml_path) or not os.path.exists(yaml_path):
+            candidate = None
+            # Try package share/config/location/location.yaml
+            if get_package_share_directory is not None:
+                try:
+                    share_dir = get_package_share_directory('path_planner')
+                    candidate = os.path.join(share_dir, 'config', 'location', 'location.yaml')
+                except Exception:
+                    candidate = None
+            # Try workspace conventional path
+            if (candidate is None) or (not os.path.exists(candidate)):
+                candidate2 = '/home/yoo/workspace/dolchair_ws/config/location/location.yaml'
+                if os.path.exists(candidate2):
+                    candidate = candidate2
+            if candidate and os.path.exists(candidate):
+                yaml_path = candidate
+
         try:
-            with open(self.location_yaml, 'r', encoding='utf-8') as f:
+            with open(yaml_path, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f) or {}
+            if yaml_path != self.location_yaml:
+                self.get_logger().info(f"location_yaml resolved to: {yaml_path}")
         except Exception as e:
-            self.get_logger().warn(f"Failed to read YAML '{self.location_yaml}': {e}")
+            self.get_logger().warn(f"Failed to read YAML '{yaml_path}': {e}")
             self.locations = {}
             return
 
@@ -80,7 +106,7 @@ class StraightPathPlanner(Node):
                 except Exception:
                     self.get_logger().warn(f"Skip invalid label entry: {name} -> {spec}")
         self.locations = locs
-        self.get_logger().info(f"Loaded {len(self.locations)} labels from YAML")
+        self.get_logger().info(f"Loaded {len(self.locations)} labels from YAML: {list(self.locations.keys())}")
 
     def _lookup_current_xy(self) -> Optional[Tuple[float, float]]:
         try:

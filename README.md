@@ -1,25 +1,36 @@
-- 실행 명령어 정리
+# VOICE_BASED_WHEELCHAIR
+---
+## 목적:
 
+---
+### 실행 명령어 정리 
+
+**Voice to text**
 1. ros2 run voice2text voice2text
 2. ros2 run llm_ros filter_input_text
 3. ros2 run llm_ros intent_router
-4. ros2 run llm_ros location_command
+4. ros2 run llm_ros location_command #주행 명령
 5. ros2 run llm_ros llm_node
 
-
-- 정적 TF 발행 & 맵 생성 
-  
+**정적 TF 발행 & SLAM 맵 생성,저장**
 1. ros2 run robot_state_publisher robot_state_publisher --ros-args -p robot_description:="$(cat src/2D_LiDAR/wheelchair_slam_bringup/urdf/rplidar_myahrs.urdf)"
 2. ros2 launch sllidar_ros2 view_sllidar_a2m8_launch.py
 3. ros2 launch rf2o_laser_odometry rf2o_laser_odometry.launch.py
 4. ros2 launch slam_toolbox online_async_launch.py slam_params_file:=$PWD/src/2D_LiDAR/wheelchair_slam_bringup/config/slam.yaml
+5. ros2 run nav2_map_server map_saver_cli -f ./config/maps/dolbang_map
 
-- 맵 저장 & 로드 & 로컬리제이션.... 맵 상에 현재 위치 파악 가능.
-1. ros2 run nav2_map_server map_saver_cli -f ./config/maps/dolbang_map
-2. ros2 run nav2_map_server map_server   --ros-args -p yaml_filename:=/home/yoo/workspace/dolchair_ws/config/maps/dolbang_map.yaml
-3. ros2 lifecycle set /map_server configure & activate
-4. ros2 run nav2_amcl amcl   --ros-args --params-file /home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/amcl.yaml
-5. ros2 lifecycle set /amcl configure & activate
+**Map load & Localization**
+1. ros2 run nav2_map_server map_server   --ros-args -p yaml_filename:=/home/yoo/workspace/dolchair_ws/config/maps/dolbang_map.yaml
+2. ros2 lifecycle set /map_server configure & activate
+3. ros2 run nav2_amcl amcl   --ros-args --params-file /home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/amcl.yaml
+4. ros2 lifecycle set /amcl configure & activate
+
+**/target_location 라벨 로드 & 경로 생성 & 주행 명령**
+1. ros2 run path_planner make_pathnplan
+2. ros2 run path_planner path_follower
+---
+**rqt graph**
+![alt text](image-1.png)
 
 
 ### 2025-09-21: 명령어 처리 아키텍처 개선
