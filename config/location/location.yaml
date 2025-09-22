@@ -1,9 +1,9 @@
 labels:
-  toilet:
+  화장실:
     x: 1.0
     y: 2.0
-    yaw: 1.5708  # optional, radians; facing +y
-  door:
+    yaw: 1.5708  # 라디안; +y 방향을 바라봄
+  문:
     x: -0.5
     y: 0.8
-    yaw: 0.0     # optional; facing +x
+    yaw: 0.0     # +x 방향을 바라봄

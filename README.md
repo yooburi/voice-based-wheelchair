@@ -7,12 +7,19 @@
 5. ros2 run llm_ros llm_node
 
 
-- 정적 TF 발행 & 맵 생성 및 저장
+- 정적 TF 발행 & 맵 생성 
   
 1. ros2 run robot_state_publisher robot_state_publisher --ros-args -p robot_description:="$(cat src/2D_LiDAR/wheelchair_slam_bringup/urdf/rplidar_myahrs.urdf)"
 2. ros2 launch sllidar_ros2 view_sllidar_a2m8_launch.py
 3. ros2 launch rf2o_laser_odometry rf2o_laser_odometry.launch.py
-4. ros2 launch slam_toolbox online_async_launch.py slam_params_file:="$(cat src/2D_LiDAR/wheelchair_slam_bringup/config/slam.yaml)"
+4. ros2 launch slam_toolbox online_async_launch.py slam_params_file:=$PWD/src/2D_LiDAR/wheelchair_slam_bringup/config/slam.yaml
+
+- 맵 저장 & 로드 & 로컬리제이션.... 맵 상에 현재 위치 파악 가능.
+1. ros2 run nav2_map_server map_saver_cli -f ./config/maps/dolbang_map
+2. ros2 run nav2_map_server map_server   --ros-args -p yaml_filename:=/home/yoo/workspace/dolchair_ws/config/maps/dolbang_map.yaml
+3. ros2 lifecycle set /map_server configure & activate
+4. ros2 run nav2_amcl amcl   --ros-args --params-file /home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/amcl.yaml
+5. ros2 lifecycle set /amcl configure & activate
 
 
 ### 2025-09-21: 명령어 처리 아키텍처 개선
