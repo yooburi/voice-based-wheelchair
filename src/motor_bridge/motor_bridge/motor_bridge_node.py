@@ -11,7 +11,7 @@ class MotorBridge(Node):
         super().__init__('motor_bridge')
 
         # === 시리얼 포트 설정 ===
-        self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=0.1)
+        self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=0.1)
 
         # === 구독 토픽 ===
         self.cmd_sub = self.create_subscription(Twist, '/cmd_vel', self.on_cmd, 10)

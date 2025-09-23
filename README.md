@@ -36,9 +36,7 @@ ros2 launch imu_preprocess imu_preprocess.launch.py
 - EKF를 함께 사용할 때는 rf2o의 TF 발행을 끄세요(`publish_tf:=false`).
 
 ```
-ros2 run rf2o_laser_odometry rf2o_laser_odometry_node \
-  --ros-args -p laser_scan_topic:=/scan -p odom_topic:=/odom \
-  -p base_frame_id:=base_link -p odom_frame_id:=odom -p publish_tf:=false -p freq:=20.0
+ros2 launch rf2o_laser_odometry rf2o_laser_odometry.launch.py
 ```
 
 4) EKF(robot_localization)

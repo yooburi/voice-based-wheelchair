@@ -43,7 +43,12 @@ class PathFollower(Node):
             .get_parameter_value().string_value
 
         self.yaw_tol = float(self.declare_parameter('yaw_tol', 0.1) \
-            .get_parameter_value().double_value)  # rad
+            .get_parameter_value().double_value)  # rad (legacy; unused if hysteresis used)
+        # Hysteresis thresholds for heading alignment (radians)
+        self.yaw_align_enter = float(self.declare_parameter('yaw_align_enter', 0.15) \
+            .get_parameter_value().double_value)  # Enter DRIVE when below this
+        self.yaw_align_exit = float(self.declare_parameter('yaw_align_exit', 0.25) \
+            .get_parameter_value().double_value)   # Leave DRIVE when above this
         self.goal_tol = float(self.declare_parameter('goal_tol', 0.2) \
             .get_parameter_value().double_value)  # meters
         self.waypoint_lookahead = float(self.declare_parameter('waypoint_lookahead', 0.3) \
@@ -51,7 +56,7 @@ class PathFollower(Node):
 
         self.angular_speed = float(self.declare_parameter('angular_speed', 0.5) \
             .get_parameter_value().double_value)  # rad/s
-        self.linear_speed = float(self.declare_parameter('linear_speed', 0.2) \
+        self.linear_speed = float(self.declare_parameter('linear_speed', 150.0) \
             .get_parameter_value().double_value)  # m/s
         self.rate_hz = float(self.declare_parameter('rate_hz', 20.0) \
             .get_parameter_value().double_value)
@@ -84,6 +89,7 @@ class PathFollower(Node):
         self._plan: List[Tuple[float, float]] = []
         self._plan_stamp = Time()
         self._idx = 0
+        self._mode = 'ROTATE'  # ROTATE or DRIVE (hysteresis)
 
         # Control timer
         self.timer = self.create_timer(1.0 / max(self.rate_hz, 1.0), self._on_timer)
@@ -171,18 +177,28 @@ class PathFollower(Node):
                 self._publish_markers(x, y, yaw, (wx, wy))
             return
 
-        # Heading control
+        # Heading control with hysteresis
         target_yaw = math.atan2(dy, dx) if dist > 1e-6 else yaw
         yaw_err = normalize_angle(target_yaw - yaw)
+        abs_err = abs(yaw_err)
+
+        # State transitions (hysteresis)
+        if self._mode == 'DRIVE':
+            if abs_err >= self.yaw_align_exit:
+                self._mode = 'ROTATE'
+        else:  # ROTATE
+            if abs_err <= self.yaw_align_enter:
+                self._mode = 'DRIVE'
 
         twist = Twist()
-        if abs(yaw_err) > self.yaw_tol:
+        if self._mode == 'ROTATE':
             # rotate in place
             twist.angular.z = self.angular_speed * (1.0 if yaw_err > 0.0 else -1.0)
             twist.linear.x = 0.0
-            self._publish_turn(1 if yaw_err > 0 else -1)
+            # Bridge convention: left=-1, right=+1
+            self._publish_turn(-1 if yaw_err > 0 else +1)
         else:
-            # go straight
+            # DRIVE: go straight and ignore small errors; keep turn_dir=0
             twist.linear.x = self.linear_speed
             twist.angular.z = 0.0
             self._publish_turn(0)
