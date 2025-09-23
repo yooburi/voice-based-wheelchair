@@ -24,7 +24,7 @@ def generate_launch_description():
                 parameters=[{
                     'laser_scan_topic' : '/scan',
                     'odom_topic' : '/odom',
-                    'publish_tf' : True,
+                    'publish_tf' : True,    #실제 로봇 imu EKF 사용시 False. 맵 딸때는 True
                     'base_frame_id' : 'base_link',
                     'odom_frame_id' : 'odom',
                     'init_pose_from_topic' : '',
