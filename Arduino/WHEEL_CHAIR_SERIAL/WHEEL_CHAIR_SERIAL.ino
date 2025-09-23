@@ -22,7 +22,7 @@ void isrPlso1() { plsoCount1++; }
 void isrPlso2() { plsoCount2++; }
 
 // ===== PID 파라미터/상태 =====
-float Kp = 0.6f, Ki = 0.2f, Kd = 0.0f;
+float Kp = 0.4f, Ki = 0.2f, Kd = 0.0f;
 float set_rps1 = 0.0f;
 float set_rps2 = 0.0f;
 
@@ -86,9 +86,9 @@ void handleSerial() {
           set_rps1 = v1;
           set_rps2 = v2;
         } else if (turn_dir == -1) {
-          set_rps1 = +100; set_rps2 = -100;
+          set_rps1 = +50; set_rps2 = -50;
         } else if (turn_dir == 1) {
-          set_rps1 = -100; set_rps2 = +100;
+          set_rps1 = -50; set_rps2 = +50;
         }
 
         lastCmdTime = millis(); // 명령 수신 시간 갱신
@@ -168,9 +168,9 @@ void loop() {
     applyMotorOutput(RUN1, RVS1, SPD1, set_rps1, duty1, RUN1_ACTIVE_HIGH);
     applyMotorOutput(RUN2, RVS2, SPD2, set_rps2, duty2, RUN2_ACTIVE_HIGH);
 
-    Serial.print("TD="); Serial.print(turn_dir);
-    Serial.print(" | Set(M1,M2)="); Serial.print(set_rps1); Serial.print(", "); Serial.print(set_rps2);
-    Serial.print(" | RPS(M1,M2)="); Serial.print(rps1); Serial.print(", "); Serial.print(rps2);
-    Serial.print(" | Duty(M1,M2)="); Serial.print(duty1); Serial.print(", "); Serial.println(duty2);
+    // Serial.print("TD="); Serial.print(turn_dir);
+    // Serial.print(" | Set(M1,M2)="); Serial.print(set_rps1); Serial.print(", "); Serial.print(set_rps2);
+    // Serial.print(" | RPS(M1,M2)="); Serial.print(rps1); Serial.print(", "); Serial.print(rps2);
+    // Serial.print(" | Duty(M1,M2)="); Serial.print(duty1); Serial.print(", "); Serial.println(duty2);
   }
 }
