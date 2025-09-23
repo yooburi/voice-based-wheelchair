@@ -88,6 +88,7 @@ class llm_control(Node):
 
         turn_msg = Int8(); turn_msg.data = 0
         self.pub_turn.publish(turn_msg)
+        
 
         twist_msg = Twist(); twist_msg.linear.x = speed
 
@@ -108,6 +109,8 @@ class llm_control(Node):
         self.cancel_previous_action()
         stop_msg = Twist(); stop_msg.linear.x = 0.0
         self.pub_cmd.publish(stop_msg)
+        turn_msg = Int8(); turn_msg.data = 0
+        self.pub_turn.publish(turn_msg)
         self.get_logger().info("Movement stopped.")
 
     def execute_rotate(self, params, command_id):
