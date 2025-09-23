@@ -90,7 +90,7 @@ class llm_control(Node):
         self.pub_turn.publish(turn_msg)
         
 
-        twist_msg = Twist(); twist_msg.linear.x = speed
+        twist_msg = Twist(); twist_msg.linear.x = speed*1000
 
         self.periodic_action_timer = self.create_timer(0.1, lambda: self.pub_cmd.publish(twist_msg))
         
