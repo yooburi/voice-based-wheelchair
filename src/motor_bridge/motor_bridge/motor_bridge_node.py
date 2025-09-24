@@ -62,7 +62,7 @@ class MotorBridge(Node):
         # Output formatting
         self.declare_parameter('int_command', False)     # ★ 소수 전송 기본
         self.declare_parameter('float_precision', 3)     # ★ 소수 자릿수
-        self.declare_parameter('tx_scale', 0.01)         # ★ 송신 스케일(아두이노 ×100과 짝)
+        self.declare_parameter('tx_scale', 1)         # ★ 송신 스케일(아두이노 ×100과 짝)
 
         # ------- Read parameters -------
         gp = self.get_parameter
