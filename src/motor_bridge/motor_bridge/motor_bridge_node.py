@@ -153,13 +153,14 @@ class MotorBridge(Node):
         if abs(delta_deg) < self.deadband_deg:
             delta_deg = 0.0
 
+        delta_deg = -delta_deg           # ★ 조향 각도 부호 반전 (여기 한 줄만 추가)
+
         delta_rad = math.radians(delta_deg)
         omega = 0.0 if self.L_virtual <= 1e-6 else v_mps * math.tan(delta_rad) / self.L_virtual
 
         v_l = v_mps - 0.5 * omega * self.track_width
         v_r = v_mps + 0.5 * omega * self.track_width
 
-        # 선속도 -> 물리적 rps
         two_pi_r = 2.0 * math.pi * self.wheel_radius
         m1_rps = v_l / two_pi_r
         m2_rps = v_r / two_pi_r
