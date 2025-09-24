@@ -17,8 +17,8 @@ class MotorBridge(Node):
         self.baud            = 115200
         self.serial_timeout  = 0.05
         self.send_rate_hz    = 20.0
-        self.cmd_timeout     = 0.5
-        self.steer_timeout   = 1.0
+        self.cmd_timeout     = 3.0
+        self.steer_timeout   = 3.0
         self.wheel_radius    = 0.25       # [m]
         self.track_width     = 0.565        # [m]
         self.L_virtual       = 0.60         # [m]
