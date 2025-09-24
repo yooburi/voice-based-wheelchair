@@ -54,10 +54,10 @@ class PathFollower(Node):
             .get_parameter_value().double_value)
 
         # ALIGN 모드 회전 속도(rad/s)
-        self.angular_speed = float(self.declare_parameter('angular_speed', 0.5) \
+        self.angular_speed = float(self.declare_parameter('angular_speed', 3.0) \
             .get_parameter_value().double_value)
         # DRIVE 모드 고정 전진 속도(m/s)
-        self.linear_speed = float(self.declare_parameter('linear_speed', 0.3) \
+        self.linear_speed = float(self.declare_parameter('linear_speed', 2.0) \
             .get_parameter_value().double_value)
         # 차량 가상 휠베이스 길이 [m] - motor_bridge의 L_virtual과 동일해야 함
         self.wheelbase_m = float(self.declare_parameter('wheelbase', 0.40) \
