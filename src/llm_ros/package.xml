@@ -4,7 +4,7 @@
   <name>llm_ros</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="smzzang21@konkuk.ac.kr">yoo</maintainer>
+  <maintainer email="leebh3023@gmail.com">leebh</maintainer>
   <license>TODO: License declaration</license>
 
   <!-- Build tool for Python (ament) -->
