@@ -14,7 +14,7 @@ DIRECTION_STOPWORDS = {
 MOVE_VERBS_PATTERN = r"(?:가|가자|가줘|이동|이동해|이동하|이동시켜|이동해줘)$"
 
 # 호출 단어 제거 로직
-WAKEWORD_PATTERN = re.compile(r'^\s*(도리|돌이|둘리)[야]?[,\s]*', re.IGNORECASE)
+WAKEWORD_PATTERN = re.compile(r'^\s*(도리|돌이|둘리)[야아]?[,\s]*', re.IGNORECASE)
 def _strip_wakeword(text: str) -> str:
     return WAKEWORD_PATTERN.sub('', text, count=1).strip()
 
