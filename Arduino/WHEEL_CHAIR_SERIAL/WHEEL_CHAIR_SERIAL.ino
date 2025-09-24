@@ -34,13 +34,18 @@ float lastError1 = 0, lastError2 = 0;
 float duty1 = 0, duty2 = 0;
 
 // ===== 펄스→속도 변환 =====
-const float PULSES_PER_REV = 6.0f; 
-const uint16_t PID_DT_MS = 100;    
+const float PULSES_PER_REV = 6.0f;    // 엔코더 1회전 펄스 수
+const uint16_t PID_DT_MS    = 100;    // PID 주기(ms)
+
+// ===== 스케일/제한 =====
+const float CMD_SCALE = 100.0f;       // /cmd_vel(0.1~0.5) → rps(10~50)
+const float MAX_RPS   = 200.0f;       // 목표 rps 상한
+const uint16_t CMD_TIMEOUT_MS = 3000; // 명령 타임아웃(ms)
 
 // ===== 시리얼 상태 =====
 String serialBuffer = "";
-int turn_dir = 0;  // -1=좌, 0=직, +1=우
-unsigned long lastCmdTime = 0; // 마지막 명령 수신 시각
+int turn_dir = 0;                     // -1=좌, 0=직, +1=우
+unsigned long lastCmdTime = 0;        // 마지막 명령 수신 시각
 
 // ===== 유틸 =====
 inline void setRun(uint8_t pin, bool active, bool activeHigh) {
@@ -58,12 +63,15 @@ void applyMotorOutput(
     digitalWrite(rvsPin, LOW);
   } else {
     setRun(runPin, true, runActiveHigh);
-    digitalWrite(rvsPin, (set_rps >= 0) ? HIGH : LOW);
-    analogWrite(spdPin, (int)duty);
+    digitalWrite(rvsPin, (set_rps >= 0) ? HIGH : LOW); // 방향
+    analogWrite(spdPin, (int)duty);                    // 0~255
   }
 }
 
 // ===== 시리얼 명령 처리 =====
+// 포맷 예: "CMD TD:0 M1:0.25 M2:0.25\n"
+//          "CMD TD:-1\n"  (좌회전 고정)
+//          "CMD TD:1\n"   (우회전 고정)
 void handleSerial() {
   while (Serial.available()) {
     char c = Serial.read();
@@ -74,20 +82,33 @@ void handleSerial() {
         int m2_idx = serialBuffer.indexOf("M2:");
 
         if (td_idx >= 0) {
-          turn_dir = serialBuffer.substring(td_idx + 3, m1_idx).toInt();
+          // TD: 뒤에서 다음 토큰 시작 전까지 추출
+          int td_end = (m1_idx >= 0) ? m1_idx : serialBuffer.length();
+          turn_dir = serialBuffer.substring(td_idx + 3, td_end).toInt();
           turn_dir = constrain(turn_dir, -1, 1);
         } else {
           turn_dir = 0;
         }
 
         if (turn_dir == 0 && m1_idx >= 0 && m2_idx >= 0) {
+          // /cmd_vel 스케일 ×100 적용
           float v1 = serialBuffer.substring(m1_idx + 3, m2_idx).toFloat();
           float v2 = serialBuffer.substring(m2_idx + 3).toFloat();
+
+          v1 *= CMD_SCALE;
+          v2 *= CMD_SCALE;
+
+          v1 = constrain(v1, -MAX_RPS, MAX_RPS);
+          v2 = constrain(v2, -MAX_RPS, MAX_RPS);
+
           set_rps1 = v1;
           set_rps2 = v2;
+
         } else if (turn_dir == -1) {
+          // 좌회전: 제자리 스핀 고정치(원하면 여기도 CMD_SCALE 기반으로 변경 가능)
           set_rps1 = +50; set_rps2 = -50;
         } else if (turn_dir == 1) {
+          // 우회전
           set_rps1 = -50; set_rps2 = +50;
         }
 
@@ -117,14 +138,17 @@ void setup() {
   setRun(RUN2, false, RUN2_ACTIVE_HIGH);
 
   Serial.begin(115200);
-  Serial.println("Arduino Motor Controller Ready (STOP until command)");
+  // Serial.println("Arduino Motor Controller Ready (STOP until command)");
+
+  lastPidTick = millis();
+  lastCmdTime = millis();
 }
 
 void loop() {
   handleSerial();
 
   // === cmd_vel 타임아웃 처리 ===
-  if (turn_dir == 0 && (millis() - lastCmdTime > 3000)) {
+  if (turn_dir == 0 && (millis() - lastCmdTime > CMD_TIMEOUT_MS)) {
     set_rps1 = 0;
     set_rps2 = 0;
   }
@@ -133,6 +157,7 @@ void loop() {
   if (now - lastPidTick >= PID_DT_MS) {
     lastPidTick += PID_DT_MS;
 
+    // --- 속도(rps) 계산 ---
     uint32_t cur1 = plsoCount1;
     uint32_t delta1 = cur1 - lastCount1;
     lastCount1 = cur1;
@@ -143,31 +168,40 @@ void loop() {
     lastCount2 = cur2;
     float rps2 = (delta2 / PULSES_PER_REV) / (PID_DT_MS / 1000.0f);
 
+    // --- PID (절대속도 제어: 방향은 RVS 핀으로 처리) ---
     if (set_rps1 == 0.0f) {
-      integral1 = lastError1 = duty1 = 0.0f;
+      integral1 = 0.0f; lastError1 = 0.0f; duty1 = 0.0f;
     } else {
-      float error1 = fabs(set_rps1) - rps1;
+      float target1 = fabs(set_rps1);
+      float error1  = target1 - rps1;
       integral1 += error1 * (PID_DT_MS / 1000.0f);
-      float deriv1 = (error1 - lastError1) / (PID_DT_MS / 1000.0f);
+      float deriv1  = (error1 - lastError1) / (PID_DT_MS / 1000.0f);
       lastError1 = error1;
-      duty1 += Kp * error1 + Ki * integral1 + Kd * deriv1;
-      duty1 = constrain(duty1, 0.0f, 255.0f);
+
+      float u1 = Kp * error1 + Ki * integral1 + Kd * deriv1;
+      duty1 += u1;                                   // 적분형 누적
+      duty1 = constrain(duty1, 0.0f, 255.0f);        // PWM 한계
     }
 
     if (set_rps2 == 0.0f) {
-      integral2 = lastError2 = duty2 = 0.0f;
+      integral2 = 0.0f; lastError2 = 0.0f; duty2 = 0.0f;
     } else {
-      float error2 = fabs(set_rps2) - rps2;
+      float target2 = fabs(set_rps2);
+      float error2  = target2 - rps2;
       integral2 += error2 * (PID_DT_MS / 1000.0f);
-      float deriv2 = (error2 - lastError2) / (PID_DT_MS / 1000.0f);
+      float deriv2  = (error2 - lastError2) / (PID_DT_MS / 1000.0f);
       lastError2 = error2;
-      duty2 += Kp * error2 + Ki * integral2 + Kd * deriv2;
+
+      float u2 = Kp * error2 + Ki * integral2 + Kd * deriv2;
+      duty2 += u2;
       duty2 = constrain(duty2, 0.0f, 255.0f);
     }
 
+    // --- 출력 적용 ---
     applyMotorOutput(RUN1, RVS1, SPD1, set_rps1, duty1, RUN1_ACTIVE_HIGH);
     applyMotorOutput(RUN2, RVS2, SPD2, set_rps2, duty2, RUN2_ACTIVE_HIGH);
 
+    // 디버그가 필요하면 아래 주석 해제
     // Serial.print("TD="); Serial.print(turn_dir);
     // Serial.print(" | Set(M1,M2)="); Serial.print(set_rps1); Serial.print(", "); Serial.print(set_rps2);
     // Serial.print(" | RPS(M1,M2)="); Serial.print(rps1); Serial.print(", "); Serial.print(rps2);
