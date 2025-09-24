@@ -22,7 +22,7 @@ void isrPlso1() { plsoCount1++; }
 void isrPlso2() { plsoCount2++; }
 
 // ===== PID 파라미터/상태 =====
-float Kp = 0.4f, Ki = 0.2f, Kd = 0.0f;
+float Kp = 0.8f, Ki = 0.2f, Kd = 0.0f;
 float set_rps1 = 0.0f;
 float set_rps2 = 0.0f;
 
@@ -124,7 +124,7 @@ void loop() {
   handleSerial();
 
   // === cmd_vel 타임아웃 처리 ===
-  if (turn_dir == 0 && (millis() - lastCmdTime > 500)) {
+  if (turn_dir == 0 && (millis() - lastCmdTime > 3000)) {
     set_rps1 = 0;
     set_rps2 = 0;
   }
