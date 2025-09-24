@@ -50,7 +50,7 @@ ros2 run robot_localization ekf_node \
 5) 맵 로드 & 로컬라이제이션(AMCL)
 
 ```
-ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=/home/yoo/workspace/dolchair_ws/config/maps/dolbang_map.yaml
+ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=/home/yoo/workspace/dolchair_ws/config/maps/gongA_map.yaml
 ros2 lifecycle set /map_server configure && ros2 lifecycle set /map_server activate
 ros2 run nav2_amcl amcl --ros-args --params-file src/2D_LiDAR/wheelchair_slam_bringup/config/amcl.yaml
 ros2 lifecycle set /amcl configure && ros2 lifecycle set /amcl activate

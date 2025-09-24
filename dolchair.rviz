@@ -89,13 +89,23 @@ Visualization Manager:
           Value: true
         laser_frame:
           Value: true
+        map:
+          Value: true
+        odom:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          odom:
+            base_link:
+              imu_link:
+                {}
+              laser_frame:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 0.699999988079071
@@ -146,6 +156,19 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /plan
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Marker
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /path_follower_markers
       Value: true
   Enabled: true
   Global Options:
@@ -227,5 +250,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1176
-  X: 609
-  Y: 78
+  X: 241
+  Y: 112
