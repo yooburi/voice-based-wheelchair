@@ -1,4 +1,11 @@
 #include <Arduino.h>
+#include <math.h>
+
+/*
+ * 입력: "CMD M1:<val> M2:<val>\n"
+ * - 여기서 <val>에 CMD_SCALE(기본 100)을 곱해 rps 목표로 사용
+ * - 파이썬에서 이미 rps로 보낸다면 CMD_SCALE = 1.0f 로 설정하세요.
+ */
 
 // ===== 핀 설정 =====
 const uint8_t SPD1  = 6;   // 모터1 PWM
@@ -34,18 +41,17 @@ float lastError1 = 0, lastError2 = 0;
 float duty1 = 0, duty2 = 0;
 
 // ===== 펄스→속도 변환 =====
-const float PULSES_PER_REV = 6.0f;    // 엔코더 1회전 펄스 수
-const uint16_t PID_DT_MS    = 100;    // PID 주기(ms)
+const float    PULSES_PER_REV  = 6.0f;   // 엔코더 1회전 펄스 수
+const uint16_t PID_DT_MS       = 100;    // PID 주기(ms)
 
-// ===== 스케일/제한 =====
-const float CMD_SCALE = 100.0f;       // /cmd_vel(0.1~0.5) → rps(10~50)
-const float MAX_RPS   = 200.0f;       // 목표 rps 상한
-const uint16_t CMD_TIMEOUT_MS = 3000; // 명령 타임아웃(ms)
+// ===== 제한/타임아웃/스케일 =====
+const float    MAX_RPS         = 250.0f; // 목표 rps 상한(안전)
+const uint16_t CMD_TIMEOUT_MS  = 3000;   // 명령 타임아웃(ms)
+const float    CMD_SCALE       = 100.0f; // ★ 수신값에 곱할 스케일(예: 0.1~0.5 → 10~50)
 
 // ===== 시리얼 상태 =====
 String serialBuffer = "";
-int turn_dir = 0;                     // -1=좌, 0=직, +1=우
-unsigned long lastCmdTime = 0;        // 마지막 명령 수신 시각
+unsigned long lastCmdTime = 0;           // 마지막 유효 명령 수신 시각
 
 // ===== 유틸 =====
 inline void setRun(uint8_t pin, bool active, bool activeHigh) {
@@ -69,50 +75,33 @@ void applyMotorOutput(
 }
 
 // ===== 시리얼 명령 처리 =====
-// 포맷 예: "CMD TD:0 M1:0.25 M2:0.25\n"
-//          "CMD TD:-1\n"  (좌회전 고정)
-//          "CMD TD:1\n"   (우회전 고정)
+// 포맷: "CMD M1:<val> M2:<val>\n"
+//  - <val>에 CMD_SCALE(100)을 곱해 rps 목표로 사용
 void handleSerial() {
   while (Serial.available()) {
     char c = Serial.read();
     if (c == '\n') {
       if (serialBuffer.startsWith("CMD")) {
-        int td_idx = serialBuffer.indexOf("TD:");
         int m1_idx = serialBuffer.indexOf("M1:");
         int m2_idx = serialBuffer.indexOf("M2:");
 
-        if (td_idx >= 0) {
-          // TD: 뒤에서 다음 토큰 시작 전까지 추출
-          int td_end = (m1_idx >= 0) ? m1_idx : serialBuffer.length();
-          turn_dir = serialBuffer.substring(td_idx + 3, td_end).toInt();
-          turn_dir = constrain(turn_dir, -1, 1);
-        } else {
-          turn_dir = 0;
-        }
-
-        if (turn_dir == 0 && m1_idx >= 0 && m2_idx >= 0) {
-          // /cmd_vel 스케일 ×100 적용
+        if (m1_idx >= 0 && m2_idx >= 0) {
           float v1 = serialBuffer.substring(m1_idx + 3, m2_idx).toFloat();
           float v2 = serialBuffer.substring(m2_idx + 3).toFloat();
 
+          // ★ 스케일 적용
           v1 *= CMD_SCALE;
           v2 *= CMD_SCALE;
 
+          // 안전 상한 적용
           v1 = constrain(v1, -MAX_RPS, MAX_RPS);
           v2 = constrain(v2, -MAX_RPS, MAX_RPS);
 
           set_rps1 = v1;
           set_rps2 = v2;
 
-        } else if (turn_dir == -1) {
-          // 좌회전: 제자리 스핀 고정치(원하면 여기도 CMD_SCALE 기반으로 변경 가능)
-          set_rps1 = +50; set_rps2 = -50;
-        } else if (turn_dir == 1) {
-          // 우회전
-          set_rps1 = -50; set_rps2 = +50;
+          lastCmdTime = millis(); // 유효 명령 수신 시각 갱신
         }
-
-        lastCmdTime = millis(); // 명령 수신 시간 갱신
       }
       serialBuffer = "";
     } else {
@@ -138,7 +127,6 @@ void setup() {
   setRun(RUN2, false, RUN2_ACTIVE_HIGH);
 
   Serial.begin(115200);
-  // Serial.println("Arduino Motor Controller Ready (STOP until command)");
 
   lastPidTick = millis();
   lastCmdTime = millis();
@@ -147,17 +135,17 @@ void setup() {
 void loop() {
   handleSerial();
 
-  // === cmd_vel 타임아웃 처리 ===
-  if (turn_dir == 0 && (millis() - lastCmdTime > CMD_TIMEOUT_MS)) {
-    set_rps1 = 0;
-    set_rps2 = 0;
+  // === 타임아웃: 일정 시간 수신 없으면 정지 ===
+  if (millis() - lastCmdTime > CMD_TIMEOUT_MS) {
+    set_rps1 = 0.0f;
+    set_rps2 = 0.0f;
   }
 
   uint32_t now = millis();
   if (now - lastPidTick >= PID_DT_MS) {
     lastPidTick += PID_DT_MS;
 
-    // --- 속도(rps) 계산 ---
+    // --- 실제 rps 계산 ---
     uint32_t cur1 = plsoCount1;
     uint32_t delta1 = cur1 - lastCount1;
     lastCount1 = cur1;
@@ -200,11 +188,5 @@ void loop() {
     // --- 출력 적용 ---
     applyMotorOutput(RUN1, RVS1, SPD1, set_rps1, duty1, RUN1_ACTIVE_HIGH);
     applyMotorOutput(RUN2, RVS2, SPD2, set_rps2, duty2, RUN2_ACTIVE_HIGH);
-
-    // 디버그가 필요하면 아래 주석 해제
-    // Serial.print("TD="); Serial.print(turn_dir);
-    // Serial.print(" | Set(M1,M2)="); Serial.print(set_rps1); Serial.print(", "); Serial.print(set_rps2);
-    // Serial.print(" | RPS(M1,M2)="); Serial.print(rps1); Serial.print(", "); Serial.print(rps2);
-    // Serial.print(" | Duty(M1,M2)="); Serial.print(duty1); Serial.print(", "); Serial.println(duty2);
   }
 }
