@@ -121,3 +121,6 @@ ros2 run nav2_map_server map_saver_cli -f ./config/maps/dolbang_map
   - `LLMNode`/`LocationCommandNode`: 각자 전용 토픽 구독
   - `LLMNode`: 호출어(예: "도리야") 자동 제거 전처리 추가
 - 요약: `filter_input_text → /text_command → intent_router → (/text_to_location → LocationCommandNode) | (/text_to_llm → LLMNode)`
+
+
+ros2 topic pub /target_location std_msgs/msg/String "{data: '화장실'}"

@@ -84,13 +84,13 @@ class llm_control(Node):
         if distance <= 0 or self.linear_speed <= 0: return
 
         speed = self.linear_speed if is_forward else -self.linear_speed
-        duration = distance / self.linear_speed
+        duration = distance*20 / self.linear_speed
 
         turn_msg = Int8(); turn_msg.data = 0
         self.pub_turn.publish(turn_msg)
         
 
-        twist_msg = Twist(); twist_msg.linear.x = speed*1000
+        twist_msg = Twist(); twist_msg.linear.x = speed
 
         self.periodic_action_timer = self.create_timer(0.1, lambda: self.pub_cmd.publish(twist_msg))
         

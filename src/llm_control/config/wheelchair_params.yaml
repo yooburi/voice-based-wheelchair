@@ -1,5 +1,5 @@
 
 llm_control:
   ros__parameters:
-    linear_speed: 0.2 #m/s      
-    angular_speed: 13.5 #degree/s
+    linear_speed: 3.0 #m/s
+    angular_speed: 3.75 #degree/s
