@@ -6,7 +6,7 @@
 - ![Image](https://github.com/user-attachments/assets/0e381624-1816-4ee6-92d2-233467a90550)
 - https://www.youtube.com/watch?v=IIPmA_FyYE8
 - rqt_graph 토폴로지
-  - ![rqt_graph](image-1.png)
+![rqt_graph](rqt_graph.png)
 - RViz 설정 파일: `dolchair.rviz` (TF/Path/Marker 시각화에 활용)
 
 ## Features(주요 기능)
