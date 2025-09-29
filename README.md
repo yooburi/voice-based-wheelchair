@@ -2,7 +2,7 @@
 
 전신마비 장애인의 자율적인 이동을 지원하는 ROS 2 기반 음성 제어 전동휠체어 시스템.
 
-##영상/데모/스크린샷
+## 영상/데모/스크린샷
 - ![Image](https://github.com/user-attachments/assets/0e381624-1816-4ee6-92d2-233467a90550)
 - https://www.youtube.com/watch?v=IIPmA_FyYE8
 - rqt_graph 토폴로지
