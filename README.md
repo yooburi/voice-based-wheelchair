@@ -2,7 +2,7 @@
 
 전신마비 장애인의 자율적인 이동을 지원하는 ROS 2 기반 음성 제어 전동휠체어 시스템.
 
-## 영상/데모/스크린샷
+## Video/GIF/rqt_graph
 - ![Image](https://github.com/user-attachments/assets/0e381624-1816-4ee6-92d2-233467a90550)
 - https://www.youtube.com/watch?v=IIPmA_FyYE8
 - rqt_graph 토폴로지
@@ -142,7 +142,7 @@
 └─ dolchair.rviz
 ```
 
-## 로드맵
+## 향후 로드맵
 - 장애물 회피 연동(로컬/전역 플래너 보강, 동적 재계획)
 - 장소 저장/관리(서비스/GUI) 및 사용자 교정 워크플로우
 - LLM 의존도 축소(온디바이스 명령 파서/룰 기반 보완)
