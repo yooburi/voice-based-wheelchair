@@ -47,12 +47,12 @@
 - 권장 실행 순서
   1) 정적 TF/URDF
      ```
-     ros2 run robot_state_publisher robot_state_publisher \
-       --ros-args -p robot_description:="$(cat src/2D_LiDAR/wheelchair_slam_bringup/urdf/rplidar_myahrs.urdf)"
+     ros2 run robot_state_publisher robot_state_publisher   --ros-args --params-file src/2D_LiDAR/wheelchair_slam_bringup/urdf/params.yaml
      ```
   2) 센서 드라이버
      ```
      ros2 launch sllidar_ros2 view_sllidar_a2m8_launch.py
+     ros2 launch wheelchair_slam_bringup rs_camera.launch.py
      ros2 launch myahrs_ros2_driver myahrs_ros2_driver.launch.py
      ros2 launch imu_preprocess imu_preprocess.launch.py
      ```
@@ -67,12 +67,9 @@
        --ros-args -r __node:=ekf_filter_node \
        --params-file src/2D_LiDAR/wheelchair_slam_bringup/config/ekf_odom.yaml
      ```
-  5) 맵 로드 & 로컬라이제이션(AMCL)
+  5) 맵 로드 & 로컬라이제이션(AMCL) 자동 / path 생성 노드 실행 + rviz2 dolchair.rviz + **2d pose estimate 해줘야 함**
      ```
-     ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=/home/yoo/workspace/dolchair_ws/config/maps/gongA_map.yaml
-     ros2 lifecycle set /map_server configure && ros2 lifecycle set /map_server activate
-     ros2 run nav2_amcl amcl --ros-args --params-file src/2D_LiDAR/wheelchair_slam_bringup/config/amcl.yaml
-     ros2 lifecycle set /amcl configure && ros2 lifecycle set /amcl activate
+     ros2 launch wheelchair_slam_bringup nav2_planner_only.launch.py  map:=/home/yoo/workspace/dolchair_ws/config/maps/gongA_map.yaml  params_file:=/home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/nav2_params_planner.yaml
      ```
   6) 음성 파이프라인(명령 처리)
      ```

@@ -32,22 +32,6 @@ def generate_launch_description() -> LaunchDescription:
             parameters=[params_file],
         ),
 
-        # Global & Local Costmaps (standalone costmap nodes)
-        Node(
-            package="nav2_costmap_2d",
-            executable="costmap_2d",
-            name="global_costmap",
-            output="screen",
-            parameters=[params_file],
-        ),
-        Node(
-            package="nav2_costmap_2d",
-            executable="costmap_2d",
-            name="local_costmap",
-            output="screen",
-            parameters=[params_file],
-        ),
-
         # Planner Server (Smac Hybrid-A*)
         Node(
             package="nav2_planner",
@@ -65,12 +49,11 @@ def generate_launch_description() -> LaunchDescription:
             output="screen",
             parameters=[{
                 "autostart": True,
+                # Costmaps are created inside servers; no standalone costmap nodes here
                 "node_names": [
                     "map_server",
                     "amcl",
                     "planner_server",
-                    "global_costmap",
-                    "local_costmap",
                 ],
             }],
         ),
@@ -78,4 +61,3 @@ def generate_launch_description() -> LaunchDescription:
         # (Optional) RViz2
         # Node(package="rviz2", executable="rviz2", arguments=["-d", "/home/yoo/workspace/dolchair_ws/dolchair.rviz"]),
     ])
-
