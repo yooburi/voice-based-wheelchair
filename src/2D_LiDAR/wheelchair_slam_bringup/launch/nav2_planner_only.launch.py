@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
+
+
+def generate_launch_description() -> LaunchDescription:
+    params_file = LaunchConfiguration("params_file")
+    map_yaml = LaunchConfiguration("map")
+
+    return LaunchDescription([
+        DeclareLaunchArgument("params_file", default_value=""),
+        DeclareLaunchArgument("map", default_value=""),
+
+        # Map Server
+        Node(
+            package="nav2_map_server",
+            executable="map_server",
+            name="map_server",
+            output="screen",
+            parameters=[{"yaml_filename": map_yaml}],
+        ),
+
+        # AMCL
+        Node(
+            package="nav2_amcl",
+            executable="amcl",
+            name="amcl",
+            output="screen",
+            parameters=[params_file],
+        ),
+
+        # Global & Local Costmaps (standalone costmap nodes)
+        Node(
+            package="nav2_costmap_2d",
+            executable="costmap_2d",
+            name="global_costmap",
+            output="screen",
+            parameters=[params_file],
+        ),
+        Node(
+            package="nav2_costmap_2d",
+            executable="costmap_2d",
+            name="local_costmap",
+            output="screen",
+            parameters=[params_file],
+        ),
+
+        # Planner Server (Smac Hybrid-A*)
+        Node(
+            package="nav2_planner",
+            executable="planner_server",
+            name="planner_server",
+            output="screen",
+            parameters=[params_file],
+        ),
+
+        # Lifecycle Manager to autostart nodes
+        Node(
+            package="nav2_lifecycle_manager",
+            executable="lifecycle_manager",
+            name="lifecycle_manager",
+            output="screen",
+            parameters=[{
+                "autostart": True,
+                "node_names": [
+                    "map_server",
+                    "amcl",
+                    "planner_server",
+                    "global_costmap",
+                    "local_costmap",
+                ],
+            }],
+        ),
+
+        # (Optional) RViz2
+        # Node(package="rviz2", executable="rviz2", arguments=["-d", "/home/yoo/workspace/dolchair_ws/dolchair.rviz"]),
+    ])
+
