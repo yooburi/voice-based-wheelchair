@@ -50,11 +50,11 @@ def generate_launch_description() -> LaunchDescription:
             parameters=[params_file],
         ),
 
-        # Recoveries Server
+        # Behavior Server (Humble+: replaces recoveries_server)
         Node(
-            package="nav2_recoveries",
-            executable="recoveries_server",
-            name="recoveries_server",
+            package="nav2_behaviors",
+            executable="behavior_server",
+            name="behavior_server",
             output="screen",
             parameters=[params_file],
         ),
@@ -81,7 +81,7 @@ def generate_launch_description() -> LaunchDescription:
                     "amcl",
                     "planner_server",
                     "controller_server",
-                    "recoveries_server",
+                    "behavior_server",
                     "bt_navigator",
                 ],
             }],
@@ -90,4 +90,3 @@ def generate_launch_description() -> LaunchDescription:
         # (Optional) RViz2 preset
         # Node(package="rviz2", executable="rviz2", arguments=["-d", "/home/yoo/workspace/dolchair_ws/dolchair.rviz"]),
     ])
-

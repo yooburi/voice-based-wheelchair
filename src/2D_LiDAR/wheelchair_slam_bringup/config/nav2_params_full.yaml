@@ -125,22 +125,20 @@ bt_navigator:
       yaw_goal_tolerance: 0.0873     # 자세(요) 허용오차(라디안) ≈ 5도
       stateful: true                 # 목표 근방 유지 시 관대하게 판단
 
-# 리커버리 서버 (Spin/BackUp/Wait/ClearCostmap)
-recoveries_server:
+# 행동 서버 (Spin/BackUp/Wait) — Humble에서는 nav2_behaviors/behavior_server 사용
+behavior_server:
   ros__parameters:
     use_sim_time: false
     costmap_topic: local_costmap/costmap_raw      # 로컬 코스트맵 토픽
     footprint_topic: local_costmap/published_footprint
-    cycle_frequency: 10.0                         # 리커버리 반복 주기(Hz)
-    recovery_plugins: ["spin", "backup", "wait", "clear_costmap"]
+    cycle_frequency: 10.0                         # 동작 반복 주기(Hz)
+    behavior_plugins: ["spin", "backup", "wait"]
     spin:
-      plugin: "nav2_recoveries/Spin"
+      plugin: "nav2_behaviors/Spin"
     backup:
-      plugin: "nav2_recoveries/BackUp"
+      plugin: "nav2_behaviors/BackUp"
     wait:
-      plugin: "nav2_recoveries/Wait"
-    clear_costmap:
-      plugin: "nav2_recoveries/ClearCostmap"
+      plugin: "nav2_behaviors/Wait"
 
 # 전역 코스트맵 (정적 지도 기반 경로계획용)
 global_costmap:
@@ -258,6 +256,6 @@ lifecycle_manager:
       "amcl",
       "planner_server",
       "controller_server",
-      "recoveries_server",
+      "behavior_server",
       "bt_navigator",
     ]
