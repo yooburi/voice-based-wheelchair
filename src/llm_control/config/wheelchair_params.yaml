@@ -3,3 +3,7 @@ llm_control:
   ros__parameters:
     linear_speed: 3.0 #m/s
     angular_speed: 3.75 #degree/s
+llm_motor:
+  ros__parameters:
+    linear_speed: 0.19 #m/s
+    angular_speed: 40.107 #degree/s
