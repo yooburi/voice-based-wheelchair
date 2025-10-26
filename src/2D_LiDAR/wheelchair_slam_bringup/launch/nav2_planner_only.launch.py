@@ -41,6 +41,33 @@ def generate_launch_description() -> LaunchDescription:
             parameters=[params_file],
         ),
 
+        # BT Navigator 
+        Node(
+            package="nav2_bt_navigator",
+            executable="bt_navigator",
+            name="bt_navigator",
+            output="screen",
+            parameters=[params_file],
+        ),
+
+        #Behavior Server
+        Node(
+            package="nav2_behaviors",
+            executable="behavior_server",
+            name="behavior_server",
+            output="screen",
+            parameters=[params_file],
+        ),
+
+        #Controller Server (MPPI)
+	    Node(
+            package="nav2_controller",
+            executable="controller_server",
+            name="controller_server",
+            output="screen",
+            parameters=[params_file],
+        ),
+
         # Lifecycle Manager to autostart nodes
         Node(
             package="nav2_lifecycle_manager",
@@ -54,10 +81,13 @@ def generate_launch_description() -> LaunchDescription:
                     "map_server",
                     "amcl",
                     "planner_server",
+                    "control_server",
+                    "bt_navigator",
+                    "behavior_server",
                 ],
             }],
         ),
-
+    
         # (Optional) RViz2
         # Node(package="rviz2", executable="rviz2", arguments=["-d", "/home/yoo/workspace/dolchair_ws/dolchair.rviz"]),
     ])
