@@ -36,7 +36,7 @@ class MotorBridge(Node):
 
         # ------- Parameters -------
         # Serial / timing
-        self.declare_parameter('port', '/dev/ttyACM0')
+        self.declare_parameter('port', '/dev/ttyACM1')
         self.declare_parameter('baud', 115200)
         self.declare_parameter('serial_timeout', 0.05)
         self.declare_parameter('send_rate_hz', 20.0)
@@ -57,7 +57,7 @@ class MotorBridge(Node):
         self.declare_parameter('deadband_deg', 0.5)    # deg
 
         # Spin 모드 고정 rps (절댓값)
-        self.declare_parameter('spin_rps_fixed', 0.05)  # 요구사항: ±50
+        self.declare_parameter('spin_rps_fixed', 0.2)  # 요구사항: ±50
 
         # Output formatting
         self.declare_parameter('int_command', False)     # ★ 소수 전송 기본

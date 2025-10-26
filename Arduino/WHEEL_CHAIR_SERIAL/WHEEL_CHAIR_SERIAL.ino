@@ -188,5 +188,11 @@ void loop() {
     // --- 출력 적용 ---
     applyMotorOutput(RUN1, RVS1, SPD1, set_rps1, duty1, RUN1_ACTIVE_HIGH);
     applyMotorOutput(RUN2, RVS2, SPD2, set_rps2, duty2, RUN2_ACTIVE_HIGH);
+
+    // handleSerial()에서 set_rps1/2 세팅 직후에 추가
+    Serial.print("ACK ");
+    Serial.print(set_rps1); Serial.print(' ');
+    Serial.println(set_rps2);
+
   }
 }

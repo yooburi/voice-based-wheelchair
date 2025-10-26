@@ -54,7 +54,7 @@ class PathFollower(Node):
             .get_parameter_value().double_value)
 
         # ALIGN 모드 회전 속도(rad/s)
-        self.angular_speed = float(self.declare_parameter('angular_speed', 3.0) \
+        self.angular_speed = float(self.declare_parameter('angular_speed', 5.0) \
             .get_parameter_value().double_value)
         # DRIVE 모드 고정 전진 속도(m/s)
         self.linear_speed = float(self.declare_parameter('linear_speed', 2.0) \
