@@ -153,3 +153,7 @@
 - sllidar_ros2 (Slamtec)
 - OpenAI Whisper(STT), OpenAI API(LLM)
 - myAHRS+ ROS2 드라이버(WITHROBOT)
+
+
+test: ros2 topic pub -1 /target_location std_msgs/String
+  "{data: '거실'}"
