@@ -8,16 +8,17 @@ amcl:
     odom_frame_id: odom
     global_frame_id: map
     scan_topic: /scan
-    set_initial_pose: true
-    initial_pose_x: 0.0
-    initial_pose_y: 0.0
-    initial_pose_a: 0.0
+    set_initial_pose: false
+    min_particles: 500
+    max_particles: 2000
+    update_min_d: 0.05
+    update_min_a: 0.05
 
 # 맵 서버 (정적 지도 로드)
 map_server:
   ros__parameters:
     # Overridden by launch via yaml_filename argument
-    yaml_filename: ""
+    yaml_filename: "/home/yoo/workspace/dolchair_ws/config/maps/gongA_map.yaml"
 
 # 전역 플래너 (Smac Hybrid-A*)
 planner_server:
@@ -59,7 +60,7 @@ controller_server:
       # 정렬 우선 동작: 제자리 회전으로 헤딩 정렬 후 전진
       use_rotate_to_heading: true
       rotate_to_heading_min_angle: 0.0873   # 정렬 임계각(라디안) ≈ 5도
-      rotate_to_heading_angular_vel: 1.5    # 정렬 회전 속도(rad/s)
+      rotate_to_heading_angular_vel: 3.0    # 정렬 회전 속도(rad/s)
       allow_reversing: false              # 후진 비허용(안정성)
       regulate_turning_velocity: false    # 회전 시 속도 감속 규제 비활성(고정 속도 유지)
       # 장애물 근접 감속 기능: 현재 비활성(필요 시 true로 변경)
@@ -222,10 +223,10 @@ local_costmap:
         data_type: PointCloud2
         marking: true
         clearing: true
-        obstacle_range: 3.5
-        raytrace_range: 4.0
-        min_obstacle_height: 0.02
-        max_obstacle_height: 1.5
+        obstacle_range: 3.5 # 장애물 인식 범위(m)
+        raytrace_range: 4.0 # 광선추적 범위(m)
+        min_obstacle_height: 0.3 # 바닥 제거(최소 높이)
+        max_obstacle_height: 1.5 # 천장/높은 노이즈 제거
 
     voxel_layer:
       plugin: "nav2_costmap_2d::VoxelLayer"   # 3D 장애물 누적/클리어(깊이센서용)
