@@ -32,7 +32,7 @@ add_executable(${EXECUTABLE_NAME}
     src/CLaserOdometry2DNode.cpp
     src/CLaserOdometry2D.cpp)
 
-include_directories(
+include_directories( 
   include include/
 )
 
