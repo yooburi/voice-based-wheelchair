@@ -48,8 +48,10 @@ class Nav2PathPlanner(Node):
         # Parameters (aligned with make_pathnplan for drop-in replacement)
         self.target_topic = self.declare_parameter('target_topic', '/target_location') \
             .get_parameter_value().string_value
-        self.plan_topic = self.declare_parameter('plan_topic', '/plan') \
-            .get_parameter_value().string_value
+
+
+        
+
         self.frame_id = self.declare_parameter('frame_id', 'map') \
             .get_parameter_value().string_value
         self.base_frame = self.declare_parameter('base_frame', 'base_link') \
@@ -62,26 +64,31 @@ class Nav2PathPlanner(Node):
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
         # Nav2 action client(s)
-        self.compute_client = None
-        self.compute_client_alt = None
-        if ComputePathToPose is None:
-            self.get_logger().error('nav2_msgs not found. Please ensure nav2_msgs is installed and declared as dependency.')
-        else:
-            # Nav2 planner action name (Humble): '/compute_path_to_pose'
-            self.compute_client = ActionClient(self, ComputePathToPose, '/compute_path_to_pose')
-            # Fallback for deployments that prefix with node name
-            self.compute_client_alt = ActionClient(self, ComputePathToPose, '/planner_server/compute_path_to_pose')
 
-        # Pub/Sub
-        self.plan_pub = self.create_publisher(Path, self.plan_topic, 10)
+
+        self.nav_client = None
+        if NavigateToPose is None:
+            self.get_logger().error('nav2_msgs not found. Please ensure nav2_msgs is installed.')
+        else:
+            # Nav2 주행 액션 이름: '/navigate_to_pose'
+            self.nav_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
+
+        # [수정 3] /plan 발행기 제거
+        # self.plan_pub = self.create_publisher(Path, self.plan_topic, 10)
+        
+        # Target 구독자는 기존과 동일
         self.target_sub = self.create_subscription(String, self.target_topic, self._on_target, 10)
 
-        # Locations
+        # ... (Location 로딩은 기존과 동일) ...
+
         self.locations: Dict[str, Tuple[float, float, Optional[float]]] = {}
         self._load_locations()
 
         self.get_logger().info(
-            f"Nav2PathPlanner up: listen {self.target_topic}, publish {self.plan_topic}, yaml={self.location_yaml}"
+
+
+            f"Nav2NavigatorClient up: listen {self.target_topic}, yaml={self.location_yaml}"
+
         )
 
     def _load_locations(self) -> None:
@@ -160,28 +167,25 @@ class Nav2PathPlanner(Node):
         goal = self._build_goal_pose(gx, gy, gyaw)
 
         # Ensure action server is up (brief wait to avoid blocking)
-        client = self.compute_client
-        if (client is None) or (not client.wait_for_server(timeout_sec=0.5)):
-            # Try fallback name
-            client = self.compute_client_alt
-            if (client is None) or (not client.wait_for_server(timeout_sec=0.5)):
-                self.get_logger().warn('Nav2 planner action not available: /compute_path_to_pose or /planner_server/compute_path_to_pose')
-                return
+
+
+        client = self.nav_client
+        if (client is None) or (not client.wait_for_server(timeout_sec=1.0)):
+            self.get_logger().warn('Nav2 navigation action server /navigate_to_pose not available')
+            return
 
         # ComputePathToPose type guaranteed by compute_client check above
 
-        goal_msg = ComputePathToPose.Goal()
-        # When use_start=False, Nav2 uses the robot's current pose internally
-        goal_msg.use_start = False
-        # Fill start minimally for completeness
-        goal_msg.start = PoseStamped()
-        goal_msg.start.header.frame_id = self.frame_id
-        goal_msg.goal = goal
+        goal_msg = NavigateToPose.Goal()
+        goal_msg.pose = goal_pose
+        # (옵션) 특정 BT를 사용하고 싶다면 여기에 파일명 지정
+        # goal_msg.behavior_tree = "path/to/my/custom.xml" 
 
-        self.get_logger().info(f"Requesting Nav2 path to '{label}' -> ({gx:.2f}, {gy:.2f})")
+        self.get_logger().info(f"Requesting Nav2 navigation to '{label}' -> ({gx:.2f}, {gy:.2f})")
         send_future = client.send_goal_async(
             goal_msg,
-            feedback_callback=self._on_compute_feedback,
+            feedback_callback=self._on_nav_feedback,
+
         )
         send_future.add_done_callback(self._on_goal_response)
 
@@ -201,34 +205,33 @@ class Nav2PathPlanner(Node):
         result_future.add_done_callback(self._on_result)
 
     def _on_compute_feedback(self, feedback_msg) -> None:
-        # Optionally handle feedback (suppress verbose logs by default)
-        # feedback = feedback_msg.feedback
-        pass
+
+
+        feedback = feedback_msg.feedback
+        self.get_logger().info(f"Navigating... Distance remaining:{feedback.distance_remaining:.2f} m", throttle_duration_sec=5.0)
+        
+
 
     def _on_result(self, future) -> None:
         try:
             result = future.result().result
+
+
+            status = future.result().status
         except Exception as e:
-            self.get_logger().error(f"Nav2 ComputePathToPose result failed: {e}")
+            self.get_logger().error(f"Nav2 navigation result failed: {e}")
             return
 
-        if result is None:
-            self.get_logger().error('Nav2 result is None')
-            return
+        if status == rclpy.action.GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().info(f"Navigation Succeeded! (Result: {result})")
+        else:
+            self.get_logger().warn(f"Navigation Failed with status: {status}")
 
-        path: Path = result.path
-        if not path.poses:
-            self.get_logger().warn('Nav2 returned empty path')
-            return
+        
+        
 
-        # Normalize header if missing
-        if not path.header.frame_id:
-            path.header.frame_id = self.frame_id
-        if path.header.stamp.sec == 0 and path.header.stamp.nanosec == 0:
-            path.header.stamp = self.get_clock().now().to_msg()
+       
 
-        self.plan_pub.publish(path)
-        self.get_logger().info(f"Published Nav2 Path with {len(path.poses)} poses (frame={path.header.frame_id})")
 
 
 def main(args=None) -> None:
