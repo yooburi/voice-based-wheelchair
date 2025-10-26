@@ -2,7 +2,7 @@ vel_converter_node:
   ros__parameters:
     
     #로봇 양 바퀴 사이의 정확한 거리 (예: 40cm)
-    wheel_base: 0.4
+    wheel_base: 0.56
     
     #바퀴의 정확한 반지름 (예: 10cm)
-    wheel_radius: 0.1
+    wheel_radius: 0.1395
