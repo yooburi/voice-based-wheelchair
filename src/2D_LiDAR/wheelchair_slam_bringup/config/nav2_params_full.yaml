@@ -1,0 +1,252 @@
+amcl:
+  ros__parameters:
+    use_sim_time: false
+    base_frame_id: base_link
+    odom_frame_id: odom
+    global_frame_id: map
+    scan_topic: /scan
+    set_initial_pose: true
+    initial_pose_x: 0.0
+    initial_pose_y: 0.0
+    initial_pose_a: 0.0
+
+map_server:
+  ros__parameters:
+    # Overridden by launch via yaml_filename argument
+    yaml_filename: ""
+
+planner_server:
+  ros__parameters:
+    expected_planner_frequency: 5.0
+    use_sim_time: false
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_smac_planner/SmacPlannerHybrid"
+      tolerance: 0.15
+      downsample_costmap: false
+      allow_unknown: false
+      max_iterations: 10000
+      max_on_approach_iterations: 1000
+      minimum_turning_radius: 0.6
+      motion_model_for_search: "DUBIN"
+      cost_travel_multiplier: 2.0
+      cache_obstacle_footprint: true
+
+controller_server:
+  ros__parameters:
+    use_sim_time: false
+    controller_frequency: 20.0
+    min_x_velocity_threshold: 0.0001
+    min_theta_velocity_threshold: 0.0001
+    controller_plugins: ["FollowPath"]
+
+    FollowPath:
+      plugin: "nav2_regulated_pure_pursuit_controller/RegulatedPurePursuitController"
+      desired_linear_vel: 0.5
+      min_lookahead_dist: 0.35
+      max_lookahead_dist: 0.9
+      lookahead_time: 1.5
+      transform_tolerance: 0.2
+      use_velocity_scaled_lookahead_dist: false
+      use_interpolation: true
+      # Align-first behavior
+      use_rotate_to_heading: true
+      rotate_to_heading_min_angle: 0.5236   # 30 deg
+      rotate_to_heading_angular_vel: 0.8
+      allow_reversing: false
+      regulate_turning_velocity: true
+      # Obstacle proximity slowdown (local costmap aware)
+      regulated_linear_scaling_min_radius: 0.6
+      regulated_linear_scaling_min_speed: 0.25
+      use_cost_regulated_linear_velocity_scaling: true
+      cost_scaling_dist: 0.5
+      cost_scaling_gain: 3.0
+      min_approach_linear_velocity: 0.18
+      approach_velocity_scaling_dist: 0.6
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: false
+    global_frame: map
+    robot_base_frame: base_link
+    transform_tolerance: 0.2
+    # Standard tree with replanning + recoveries
+    default_nav_to_pose_bt_xml: "navigate_w_replanning_and_recovery.xml"
+    default_nav_through_poses_bt_xml: "navigate_through_poses_w_replanning_and_recovery.xml"
+    plugin_lib_names:
+      - nav2_compute_path_to_pose_action_bt_node
+      - nav2_follow_path_action_bt_node
+      - nav2_spin_action_bt_node
+      - nav2_wait_action_bt_node
+      - nav2_back_up_action_bt_node
+      - nav2_clear_costmap_service_bt_node
+      - nav2_is_path_valid_condition_bt_node
+      - nav2_goal_reached_condition_bt_node
+      - nav2_initial_pose_received_condition_bt_node
+      - nav2_goal_updated_condition_bt_node
+      - nav2_reinitialize_global_localization_service_bt_node
+      - nav2_rate_controller_bt_node
+      - nav2_distance_controller_bt_node
+      - nav2_speed_controller_bt_node
+      - nav2_truncate_path_action_bt_node
+      - nav2_path_expiring_timer_condition_bt_node
+      - nav2_distance_traveled_condition_bt_node
+      - nav2_remove_passed_goals_action_bt_node
+      - nav2_planner_selector_bt_node
+      - nav2_goal_checker_selector_bt_node
+      - nav2_controller_selector_bt_node
+      - nav2_smoothing_selector_bt_node
+      - nav2_controller_cancel_bt_node
+      - nav2_path_longer_on_approach_bt_node
+      - nav2_is_battery_low_condition_bt_node
+      - nav2_navigate_through_poses_action_bt_node
+      - nav2_navigate_to_pose_action_bt_node
+      - nav2_time_expired_condition_bt_node
+      - nav2_path_straight_condition_bt_node
+      - nav2_goal_updated_controller_bt_node
+    # Progress / goal checkers (stall + tolerance)
+    progress_checker_plugin: "progress_checker"
+    goal_checker_plugins: ["goal_checker"]
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.5
+      movement_time_allowance: 8.0
+    goal_checker:
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.2
+      stateful: true
+
+recoveries_server:
+  ros__parameters:
+    use_sim_time: false
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
+    cycle_frequency: 10.0
+    recovery_plugins: ["spin", "backup", "wait", "clear_costmap"]
+    spin:
+      plugin: "nav2_recoveries/Spin"
+    backup:
+      plugin: "nav2_recoveries/BackUp"
+    wait:
+      plugin: "nav2_recoveries/Wait"
+    clear_costmap:
+      plugin: "nav2_recoveries/ClearCostmap"
+
+global_costmap:
+  ros__parameters:
+    global_frame: map
+    robot_base_frame: base_link
+    use_sim_time: false
+    update_frequency: 5.0
+    publish_frequency: 2.0
+    rolling_window: false
+    resolution: 0.05
+    track_unknown_space: false
+    robot_radius: 0.30
+    plugins: ["static_layer", "obstacle_lidar", "obstacle_depth", "inflation_layer"]
+
+    static_layer:
+      plugin: "nav2_costmap_2d::StaticLayer"
+      map_subscribe_transient_local: true
+
+    obstacle_lidar:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      observation_sources: scan
+      scan:
+        topic: /scan
+        data_type: LaserScan
+        marking: true
+        clearing: true
+        obstacle_range: 4.0
+        raytrace_range: 4.5
+
+    obstacle_depth:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      observation_sources: depth_cloud
+      depth_cloud:
+        topic: /depth_camera/depth/color/points
+        data_type: PointCloud2
+        marking: true
+        clearing: true
+        obstacle_range: 3.5
+        raytrace_range: 4.0
+        min_obstacle_height: 0.02
+        max_obstacle_height: 1.5
+
+    inflation_layer:
+      plugin: "nav2_costmap_2d::InflationLayer"
+      inflation_radius: 0.5
+      cost_scaling_factor: 2.5
+
+local_costmap:
+  ros__parameters:
+    global_frame: odom
+    robot_base_frame: base_link
+    use_sim_time: false
+    update_frequency: 10.0
+    publish_frequency: 5.0
+    rolling_window: true
+    width: 6.0
+    height: 6.0
+    resolution: 0.05
+    robot_radius: 0.30
+    plugins: ["obstacle_lidar", "obstacle_depth", "voxel_layer", "inflation_layer"]
+
+    obstacle_lidar:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      observation_sources: scan
+      scan:
+        topic: /scan
+        sensor_frame: laser_frame
+        data_type: LaserScan
+        marking: true
+        clearing: true
+        obstacle_range: 4.0
+        raytrace_range: 4.5
+
+    obstacle_depth:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      observation_sources: depth_cloud
+      depth_cloud:
+        topic: /depth_camera/depth/color/points
+        data_type: PointCloud2
+        marking: true
+        clearing: true
+        obstacle_range: 3.5
+        raytrace_range: 4.0
+        min_obstacle_height: 0.02
+        max_obstacle_height: 1.5
+
+    voxel_layer:
+      plugin: "nav2_costmap_2d::VoxelLayer"
+      origin_z: 0.0
+      z_voxels: 16
+      z_resolution: 0.075
+      max_obstacle_height: 1.6
+      unknown_threshold: 10
+      mark_threshold: 2
+      observation_sources: depth_cloud
+      depth_cloud:
+        topic: /depth_camera/depth/color/points
+        data_type: PointCloud2
+        marking: true
+        clearing: true
+
+    inflation_layer:
+      plugin: "nav2_costmap_2d::InflationLayer"
+      inflation_radius: 0.5
+      cost_scaling_factor: 2.5
+
+lifecycle_manager:
+  ros__parameters:
+    autostart: true
+    node_names: [
+      "map_server",
+      "amcl",
+      "planner_server",
+      "controller_server",
+      "recoveries_server",
+      "bt_navigator",
+    ]
+

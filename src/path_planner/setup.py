@@ -23,6 +23,7 @@ setup(
             'make_pathnplan = path_planner.make_pathnplan:main',
             'path_follower = path_planner.path_follower:main',
             'nav2_pathnplan = path_planner.nav2_pathnplan:main',
+            'nav2_nav_to_pose = path_planner.nav2_navigate_to_pose:main',
         ],
     },
 )
