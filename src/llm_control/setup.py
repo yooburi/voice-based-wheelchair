@@ -26,7 +26,6 @@ setup(
         'console_scripts': [
            'llm_control = llm_control.llm_control:main',
            'json_publisher = llm_control.json_publisher_node:main',
-           'llm_motor = llm_control.llm_motor:main',
         ],
     },
 )
