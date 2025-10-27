@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'openai'],
+    install_requires=['setuptools', 'openai', 'pvporcupine', 'pyaudio', 'pyyaml', 'tf2_ros'],
     zip_safe=True,
     maintainer='leebh',
     maintainer_email='leebh3023@gmail.com',
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'filter_input_text = llm_ros.filter_input_text:main',
+            'wake_word_detector = llm_ros.wake_word_detector:main',
             'llm_node = llm_ros.llm_node:main',
             'location_command = llm_ros.location_command:main',
             'intent_router = llm_ros.intent_router:main',

@@ -13,12 +13,20 @@ from scipy.signal import butter, lfilter
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 
 
 class Voice2TextNode(Node):
     def __init__(self):
         super().__init__('voice2text_node')
+
+        self.stt_active = False # KWS 활성화 여부
+        self.stt_activation_sub = self.create_subscription(
+            Bool, 
+            '/activate_stt', 
+            self._on_stt_activation, 
+            10)
+
 
         # 파라미터
         self.out_topic = self.declare_parameter('out_topic', '/voice2text') \
@@ -102,6 +110,13 @@ class Voice2TextNode(Node):
                 self.language = str(p.value)
         return rclpy.parameter.SetParametersResult(successful=True)
 
+    def _on_stt_activation(self, msg: Bool):
+        if msg.data and not self.stt_active:
+            self.get_logger().info("STT 활성화 신호 수신. 음성 인식 시작.")
+        elif not msg.data and self.stt_active:
+            self.get_logger().info("STT 비활성화 신호 수신. 음성 인식 중지.")
+        self.stt_active = msg.data
+
     # ---- 오디오 ----
     def _audio_callback(self, indata, frames, time, status):
         if status:
@@ -161,6 +176,14 @@ class Voice2TextNode(Node):
     def _stt_loop(self):
         while rclpy.ok():
             try:
+                if not self.stt_active: # KWS 활성화 여부 확인
+                    # STT가 비활성화된 경우, 큐를 비우고 다음 루프로 넘어감
+                    try:
+                        _ = self.audio_queue.get(timeout=0.2)
+                    except queue.Empty:
+                        pass
+                    continue
+
                 if not self.active:
                     # 무한 성장 방지를 위해 큐를 조금씩 비움
                     try:
