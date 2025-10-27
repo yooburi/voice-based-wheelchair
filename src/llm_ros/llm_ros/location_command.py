@@ -26,7 +26,7 @@ class LocationCommandNode(Node):
             .get_parameter_value().string_value
         self.target_location_topic = self.declare_parameter('target_location_topic', '/target_location') \
             .get_parameter_value().string_value
-        self.location_yaml_path = self.declare_parameter('location_yaml_path', '/home/lbh/dorvat/voice-based-wheelchair/config/location/location.yaml') \
+        self.location_yaml_path = self.declare_parameter('location_yaml_path', '/home/yoo/workspace/dolchair_ws/config/location/location.yaml') \
             .get_parameter_value().string_value
         self.map_frame = self.declare_parameter('map_frame', 'map') \
             .get_parameter_value().string_value
