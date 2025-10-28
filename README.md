@@ -37,7 +37,7 @@
        ros2 launch wheelchair_slam_bringup nav2_planner_only.launch.py  map:=/home/yoo/workspace/dolchair_ws/config/maps/GongHall_map.yaml  params_file:=/home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/nav2_params_planner.yaml
        ```
      - RViz2에서 2D Pose Estimate 수행하기
-     - 
+  
   6) 음성 파이프라인(명령 처리)
      ```
      ros2 run voice2text voice2text
