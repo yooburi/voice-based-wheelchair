@@ -14,8 +14,8 @@ class llm_control(Node):
     def __init__(self):
         super().__init__('llm_control')
 
-        self.declare_parameter('linear_speed', 0.2, ParameterDescriptor(description='Default linear speed in m/s'))
-        self.declare_parameter('angular_speed', 30.0, ParameterDescriptor(description='Default angular speed in deg/s'))
+        self.declare_parameter('linear_speed', 3.0, ParameterDescriptor(description='Default linear speed in m/s'))
+        self.declare_parameter('angular_speed', 3.75, ParameterDescriptor(description='Default angular speed in deg/s'))
 
         self.linear_speed = self.get_parameter('linear_speed').get_parameter_value().double_value
         self.angular_speed = self.get_parameter('angular_speed').get_parameter_value().double_value

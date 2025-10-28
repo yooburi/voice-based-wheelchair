@@ -24,7 +24,7 @@
   5) 맵 로드 & 로컬라이제이션(AMCL)
      - Planner Only 모드(기존 Planneronly + Pure pursuit):
        ```
-       ros2 launch wheelchair_slam_bringup nav2_planner_only.launch.py  map:=/home/yoo/workspace/dolchair_ws/config/maps/gongA_map.yaml  params_file:=/home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/nav2_params_planner.yaml
+       ros2 launch wheelchair_slam_bringup nav2_planner_only.launch.py  map:=/home/yoo/workspace/dolchair_ws/config/maps/GongHall_map.yaml  params_file:=/home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/nav2_params_planner.yaml
        ```
      - Full Nav2 모드(Planner+Controller+BT, RPP/복구 포함):
        ```
