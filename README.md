@@ -40,8 +40,8 @@
   
   6) 음성 파이프라인(명령 처리)
      ```
+     ros2 run llm_ros wake_word_detector
      ros2 run voice2text voice2text
-     ros2 run llm_ros filter_input_text
      ros2 run llm_ros intent_router
      ros2 run llm_ros location_command
      ros2 run llm_ros llm_node
