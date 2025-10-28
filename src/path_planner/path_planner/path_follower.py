@@ -32,7 +32,7 @@ class PathFollower(Node):
         super().__init__('path_follower')
 
         # 파라미터
-        self.plan_topic = self.declare_parameter('plan_topic', '/plan') \
+        self.plan_topic = self.declare_parameter('plan_topic', '/local_plan') \
             .get_parameter_value().string_value
         self.cmd_vel_topic = self.declare_parameter('cmd_vel_topic', '/cmd_vel') \
             .get_parameter_value().string_value
