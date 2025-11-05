@@ -6,7 +6,7 @@ import queue
 import threading
 from typing import Optional
 
-import torch 
+import torch
 import numpy as np
 import sounddevice as sd
 import scipy.io.wavfile as wav
@@ -17,8 +17,35 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String, Bool
 
+"""
+voice2text.py: Voice to Text Node using Whisper and Silero VAD.
+
+Originated from Highsky7 [Repo](https://github.com/Highsky7/COREA-_Jang_Yeongsil_Invention_and_Startup_Competition)
+
+Need to make wav_folder in advance for pracical use:
+    ```bash
+    mkdir -p ./src/voice2text/wav_folder
+    ```
+
+"""
+
 
 class Voice2TextNode(Node):
+    """ Voice to Text Node using Whisper and Silero VAD.
+
+    Args:
+        input_voice: Microphone stereo audio input to mono input for Silero VAD model.
+        output_topic: ROS2 topic(/voice2text) to publish transcribed text.
+    Features:
+    1. High-pass filter to remove rumble noise.
+    2. DSP-based noise reduction using noisereduce.
+    3. AI-based Voice Activity Detection (VAD) using Silero VAD model.
+    4. Whisper model for speech-to-text transcription.
+    5. Publishes transcribed text to a ROS2 topic.
+    6. STT activation/deactivation via a ROS2 topic.
+    7. Dynamic parameter adjustment at runtime.
+    8. Designed for real-time operation with threading.
+    """
     def __init__(self):
         super().__init__('voice2text_node')
 
@@ -82,8 +109,7 @@ class Voice2TextNode(Node):
         self.whisper_model = None
         self.vad_model = None
         self.vad_get_speech_timestamps = None
-        # self.ns_model = None # [삭제됨]
-
+        
         self.device, self.model_size = self._pick_device_and_model()
         self._load_models() 
 
@@ -111,7 +137,6 @@ class Voice2TextNode(Node):
                 self.active = bool(p.value)
             elif p.name == 'language' and p.type_ == p.Type.STRING:
                 self.language = str(p.value)
-            # --- [수정됨] ---
             elif p.name == 'nr_enabled' and p.type_ == p.Type.BOOL:
                 self.nr_enabled = bool(p.value)
             elif p.name == 'silero_vad_enabled' and p.type_ == p.Type.BOOL:
@@ -120,7 +145,6 @@ class Voice2TextNode(Node):
                 self.silero_vad_threshold = float(p.value)
             elif p.name == 'vad_debug' and p.type_ == p.Type.BOOL:
                 self.vad_debug = bool(p.value)
-            # --- [수정됨] ---
         return rclpy.parameter.SetParametersResult(successful=True)
 
     def _on_stt_activation(self, msg: Bool):
@@ -171,7 +195,6 @@ class Voice2TextNode(Node):
             size = 'large-v3-turbo'
         return device, size
 
-    # [수정됨] Silero NS 로드 부분 제거
     def _load_models(self):
         # 1. Whisper 모델 로드
         try:
@@ -199,8 +222,6 @@ class Voice2TextNode(Node):
             self.get_logger().info("Silero VAD model loaded.")
         except Exception as e:
             self.get_logger().error(f"Failed to load Silero VAD model: {e}")
-
-        # 3. Silero NS 모델 로드 [삭제됨]
 
 
     # ---- STT 루프 (핵심 로직 수정) ----
