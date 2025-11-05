@@ -18,6 +18,7 @@ from rclpy.node import Node
 from std_msgs.msg import String, Bool
 
 """
+
 voice2text.py: Voice to Text Node using Whisper and Silero VAD.
 
 Originated from Highsky7 [Repo](https://github.com/Highsky7/COREA-_Jang_Yeongsil_Invention_and_Startup_Competition)
@@ -31,7 +32,8 @@ Need to make wav_folder in advance for pracical use:
 
 
 class Voice2TextNode(Node):
-    """ Voice to Text Node using Whisper and Silero VAD.
+    """
+    Voice to Text Node using Whisper and Silero VAD.
 
     Args:
         input_voice: Microphone stereo audio input to mono input for Silero VAD model.
