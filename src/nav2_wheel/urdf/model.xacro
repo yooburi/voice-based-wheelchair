@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+      <!-- rplidar_myahrs.urdf 원문을 여기 -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="wheelchair_bot" >
+    <xacro:include filename="macros.xacro"/>
+
+    <material name="white">
+        <color rgba="1 1 1 1" />
+    </material>
+
+    <material name="blue">
+        <color rgba="0 0 1 1"/>
+    </material>
+    <link name="base_footprint"/>
+
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 0.25"/>
+            <geometry>
+                <box size="0.45 0.45 0.5"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.25"/>
+            <geometry>
+                <box size="0.45 0.45 0.5"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="1" x="0.45" y="0.45" z="0.5">
+            <origin xyz="0 0 0.25" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+
+    <joint name="base_joint" type="fixed">
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
+      <origin xyz="0.0 0.0 0.1" rpy= "0 0 0"/>
+    </joint>
+
+    <link name="wheel_left">
+        <visual>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.3" length="0.11"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.3" length="0.11"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.5" length="0.11" radius="0.3">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+    <joint name="left_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="wheel_left"/>
+        <origin xyz="-0.2 0.28 0.0395" rpy="1.57 0 0" />
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="wheel_right">
+        <visual>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.3" length="0.11"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.3" length="0.11"/>
+            </geometry>
+        </collision>
+        <xacro:inertial_cylinder mass="0.5" length="0.11" radius="0.3">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_cylinder>
+    </link>
+
+    <joint name="right_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="wheel_right"/>
+        <origin xyz="-0.2 -0.28 0.0395" rpy="1.57 0 0" />
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="caster_wheel">
+        <visual>
+            <geometry>
+                <sphere radius="0.1"/>           
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <sphere radius="0.1"/>    
+            </geometry>
+        </collision>
+        <xacro:inertial_sphere mass="0.1" radius="0.1">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_sphere>
+    </link>
+    <joint name="caster_wheel_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="caster_wheel"/>
+        <origin xyz="0.2 0 0"/>
+    </joint>
+
+
+
+    <link name="laser_frame"/>
+    <link name="imu_link"/>
+    <link name="depth_camera_link"/>
+
+
+    
+
+    <joint name="base_to_laser" type="fixed">
+        <parent link="base_footprint"/>
+        <child link="laser_frame"/>
+        <origin xyz="0.0 0.23 1.2" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="base_to_imu" type="fixed">
+        <parent link="base_footprint"/>
+        <child link="imu_link"/>
+        <origin xyz="0.0 0.0 0.05" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="base_to_camera" type="fixed">
+        <parent link="base_footprint"/>
+        <child link="depth_camera_link"/>
+        <origin xyz="0.0 0.23 1.0" rpy="0 0 0"/>
+    </joint>
+
+    
+
+    <link name="camera_link"></link>
+
+    <link name="camera_depth_frame"></link>
+
+    <link name="camera_depth_optical_frame"></link>
+
+    <link name="camera_color_frame"></link>
+
+    <link name="camera_color_optical_frame"></link>
+
+    <link name="camera_left_ir_frame"></link>
+
+    <link name="camera_left_ir_optical_frame"></link>
+
+    <link name="camera_right_ir_frame"></link>
+
+    <link name="camera_right_ir_optical_frame"></link>
+
+
+    
+
+    <joint name="camera_link_joint" type="fixed">
+        <parent link="depth_camera_link" />
+        <child link="camera_link" />
+        <origin xyz="0 0.0175 0.0125 " rpy="0 0 0" />
+    </joint>
+
+    <joint name="camera_depth_joint" type="fixed">
+        <parent link="camera_link" />
+        <child link="camera_depth_frame" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="camera_depth_optical_joint" type="fixed">
+        <parent link="camera_depth_frame" />
+        <child link="camera_depth_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+
+    <joint name="camera_color_joint" type="fixed">
+        <parent link="camera_depth_frame" />
+        <child link="camera_color_frame" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="camera_color_optical_joint" type="fixed">
+        <parent link="camera_color_frame" />
+        <child link="camera_color_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+
+    <joint name="camera_left_ir_joint" type="fixed">
+        <parent link="camera_depth_frame" />
+        <child link="camera_left_ir_frame" />
+        <origin xyz="0 0 0 " rpy="0 0 0 " />
+    </joint>
+
+    <joint name="camera_left_ir_optical_joint" type="fixed">
+        <parent link="camera_left_ir_frame" />
+        <child link="camera_left_ir_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+
+    <joint name="camera_right_ir_joint" type="fixed">
+        <parent link="camera_depth_frame" />
+        <child link="camera_right_ir_frame" />
+        <origin xyz="0 -0.050 0 " rpy="0 0 0" />
+    </joint>
+
+    <joint name="camera_right_ir_optical_joint" type="fixed">
+        <parent link="camera_right_ir_frame" />
+        <child link="camera_right_ir_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+    <xacro:include filename="gazebo.xacro"/>
+    <xacro:include filename="lidar.xacro"/>
+
+
+</robot>

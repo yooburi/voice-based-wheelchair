@@ -1,0 +1,29 @@
+robot_state_publisher:
+  ros__parameters:
+    robot_description: |
+      <?xml version="1.0"?>
+      <!-- rplidar_myahrs.urdf 원문을 여기 -->
+      <robot name="wheelchair_bot">
+        <link name="base_link"/>
+        <link name="laser_frame"/>
+        <link name="imu_link"/>
+        <link name="depth_camera_link"/>
+
+        <joint name="base_to_laser" type="fixed">
+          <parent link="base_link"/>
+          <child link="laser_frame"/>
+          <origin xyz="0.0 0.23 0.95" rpy="0 0 0"/>
+        </joint>
+
+        <joint name="base_to_imu" type="fixed">
+          <parent link="base_link"/>
+          <child link="imu_link"/>
+          <origin xyz="0.0 0.0 0.05" rpy="0 0 0"/>
+        </joint>
+
+        <joint name="base_to_camera" type="fixed">
+          <parent link="base_link"/>
+          <child link="depth_camera_link"/>
+          <origin xyz="0.0 0.23 0.85" rpy="0 0 0"/>
+        </joint>
+      </robot>

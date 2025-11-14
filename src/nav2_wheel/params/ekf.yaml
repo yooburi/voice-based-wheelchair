@@ -1,0 +1,44 @@
+ekf_node:
+  ros__parameters:
+    use_sim_time: True # 시뮬레이션 사용 여부 (Heo님은 True)
+    
+    # 1. EKF 기본 설정
+    frequency: 30.0                # EKF 업데이트 주기 (Hz). 컨트롤러 주기와 맞추거나 높게 설정
+    two_d_mode: true               # 2D 주행 로봇(휠체어 등)은 반드시 true로 설정. (Z, Roll, Pitch 무시)
+    publish_tf: true               # EKF가 odom -> base_link TF를 발행하도록 설정 (가장 중요!)
+
+    # 2. 프레임 설정
+    map_frame: map
+    odom_frame: odom               # EKF가 생성할 오도메트리 프레임 (표준: odom)
+    base_link_frame: base_footprint     # 로봇의 기준 프레임 (⚠️아래 4단계 참고)
+    world_frame: odom              # EKF의 기준 프레임 (보통 odom)
+
+    # 3. 센서 입력 설정 (휠 오도메트리)
+    odom0: /odom                   # 👈 휠 인코더가 발행하는 오도메트리 토픽 이름
+    odom0_config:
+      # [X, Y, Z, Roll, Pitch, Yaw, 
+      #  Vx, Vy, Vz, Vroll, Vpitch, Vyaw,
+      #  Ax, Ay, Az]
+      # 휠 오도메트리에서는 선속도(Vx)와 각속도(Vyaw)만 사용
+      [false, false, false,
+       false, false, false,
+       true,  false, false,
+       false, false, false,
+       false, false, false]
+    odom0_differential: false      # 오도메트리가 속도가 아닌 위치 변화량으로 들어오면 true
+
+    # 4. 센서 입력 설정 (IMU)
+    imu0: /imu_plugin/out
+                # 👈 IMU가 발행하는 토픽 이름
+    imu0_config:
+      # [X, Y, Z, Roll, Pitch, Yaw, 
+      #  Vx, Vy, Vz, Vroll, Vpitch, Vyaw,
+      #  Ax, Ay, Az]
+      # IMU에서는 방향(Yaw)과 각속도(Vyaw)만 사용 (2D 모드이므로 Roll, Pitch는 false)
+      [false, false, false,
+       false, false, true,
+       false, false, false,
+       false, false, true,
+       false, false, false]
+    imu0_differential: false       # IMU가 방향(Orientation)이 아닌 변화량을 주면 true
+    imu0_remove_gravitational_acceleration: true
