@@ -8,12 +8,11 @@ from typing import Dict, Optional, Tuple
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
-from rclpy.duration import Duration
-from rclpy.time import Time
 
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
-from nav_msgs.msg import Path
+from action_msgs.msg import GoalStatus
+from nav2_msgs.action import NavigateToPose
 
 import tf2_ros
 import yaml
@@ -22,11 +21,6 @@ try:
     from ament_index_python.packages import get_package_share_directory  # type: ignore
 except Exception:
     get_package_share_directory = None  # type: ignore
-
-try:
-    from nav2_msgs.action import ComputePathToPose  # type: ignore
-except Exception:
-    ComputePathToPose = None  # type: ignore
 
 
 def yaw_to_quaternion(yaw: float):
@@ -37,21 +31,16 @@ def yaw_to_quaternion(yaw: float):
 
 class Nav2PathPlanner(Node):
     """
-    Subscribe: target location label (String)
-    Action: call Nav2 ComputePathToPose to generate a plan
-    Publish: nav_msgs/Path on /plan (compatible with existing path_follower)
+    Subscribe: target location label (std_msgs/String)
+    Action: send Nav2 NavigateToPose goal
     """
 
     def __init__(self) -> None:
         super().__init__('nav2_path_planner')
 
-        # Parameters (aligned with make_pathnplan for drop-in replacement)
+        # Parameters
         self.target_topic = self.declare_parameter('target_topic', '/target_location') \
             .get_parameter_value().string_value
-
-
-        
-
         self.frame_id = self.declare_parameter('frame_id', 'map') \
             .get_parameter_value().string_value
         self.base_frame = self.declare_parameter('base_frame', 'base_link') \
@@ -59,42 +48,29 @@ class Nav2PathPlanner(Node):
         self.location_yaml = self.declare_parameter('location_yaml', 'config/location/location.yaml') \
             .get_parameter_value().string_value
 
-        # TF (used only for diagnostics or potential future use)
+        # TF (for diagnostics / future use)
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
-        # Nav2 action client(s)
+        # Nav2 action client
+        self.nav_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
 
-
-        self.nav_client = None
-        if NavigateToPose is None:
-            self.get_logger().error('nav2_msgs not found. Please ensure nav2_msgs is installed.')
-        else:
-            # Nav2 주행 액션 이름: '/navigate_to_pose'
-            self.nav_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
-
-        # [수정 3] /plan 발행기 제거
-        # self.plan_pub = self.create_publisher(Path, self.plan_topic, 10)
-        
-        # Target 구독자는 기존과 동일
+        # Target subscriber
         self.target_sub = self.create_subscription(String, self.target_topic, self._on_target, 10)
 
-        # ... (Location 로딩은 기존과 동일) ...
-
+        # Load locations
         self.locations: Dict[str, Tuple[float, float, Optional[float]]] = {}
         self._load_locations()
 
         self.get_logger().info(
-
-
-            f"Nav2NavigatorClient up: listen {self.target_topic}, yaml={self.location_yaml}"
-
+            f"Nav2PathPlanner up. listen={self.target_topic}, yaml={self.location_yaml}"
         )
 
     def _load_locations(self) -> None:
         yaml_path = self.location_yaml
-        # Resolve to an existing file if a relative/bad path is given
-        if not os.path.isabs(yaml_path) or not os.path.exists(yaml_path):
+
+        # Resolve fallback path
+        if (not os.path.isabs(yaml_path)) or (not os.path.exists(yaml_path)):
             candidate = None
             if get_package_share_directory is not None:
                 try:
@@ -115,7 +91,7 @@ class Nav2PathPlanner(Node):
             if yaml_path != self.location_yaml:
                 self.get_logger().info(f"location_yaml resolved to: {yaml_path}")
         except Exception as e:
-            self.get_logger().warn(f"Failed to read YAML '{yaml_path}': {e}")
+            self.get_logger().warning(f"Failed to read YAML '{yaml_path}': {e}")
             self.locations = {}
             return
 
@@ -130,7 +106,7 @@ class Nav2PathPlanner(Node):
                     yaw = float(yaw) if yaw is not None else None
                     locs[str(name)] = (x, y, yaw)
                 except Exception:
-                    self.get_logger().warn(f"Skip invalid label entry: {name} -> {spec}")
+                    self.get_logger().warning(f"Skip invalid label entry: {name} -> {spec}")
         self.locations = locs
         self.get_logger().info(f"Loaded {len(self.locations)} labels: {list(self.locations.keys())}")
 
@@ -154,11 +130,11 @@ class Nav2PathPlanner(Node):
         if not label:
             return
 
-        # Reload YAML each time to pick up runtime edits
+        # Reload YAML at runtime
         self._load_locations()
 
         if label not in self.locations:
-            self.get_logger().warn(
+            self.get_logger().warning(
                 f"Unknown label '{label}'. Known: {list(self.locations.keys())}"
             )
             return
@@ -166,28 +142,29 @@ class Nav2PathPlanner(Node):
         gx, gy, gyaw = self.locations[label]
         goal = self._build_goal_pose(gx, gy, gyaw)
 
-        # Ensure action server is up (brief wait to avoid blocking)
-
-
-        client = self.nav_client
-        if (client is None) or (not client.wait_for_server(timeout_sec=1.0)):
-            self.get_logger().warn('Nav2 navigation action server /navigate_to_pose not available')
+        # Wait for action server
+        if not self.nav_client.wait_for_server(timeout_sec=1.0):
+            self.get_logger().warning('Nav2 action server /navigate_to_pose not available')
             return
 
-        # ComputePathToPose type guaranteed by compute_client check above
-
         goal_msg = NavigateToPose.Goal()
-        goal_msg.pose = goal_pose
-        # (옵션) 특정 BT를 사용하고 싶다면 여기에 파일명 지정
-        # goal_msg.behavior_tree = "path/to/my/custom.xml" 
+        goal_msg.pose = goal
+        # goal_msg.behavior_tree = "/opt/ros/humble/share/nav2_bt_navigator/behavior_trees/navigate_to_pose_w_replanning_and_recovery.xml"
 
-        self.get_logger().info(f"Requesting Nav2 navigation to '{label}' -> ({gx:.2f}, {gy:.2f})")
-        send_future = client.send_goal_async(
+        self.get_logger().info(f"Request Nav2 navigation to '{label}' -> ({gx:.2f}, {gy:.2f})")
+
+        send_future = self.nav_client.send_goal_async(
             goal_msg,
             feedback_callback=self._on_nav_feedback,
-
         )
         send_future.add_done_callback(self._on_goal_response)
+
+    def _on_nav_feedback(self, feedback_msg) -> None:
+        fb = feedback_msg.feedback
+        # 일부 버전에선 distance_remaining이 없을 수도 있으니 getattr로 안전 처리
+        dist = getattr(fb, 'distance_remaining', None)
+        if dist is not None:
+            self.get_logger().info(f"Navigating... distance_remaining: {dist:.2f} m")
 
     def _on_goal_response(self, future) -> None:
         try:
@@ -197,41 +174,26 @@ class Nav2PathPlanner(Node):
             return
 
         if not goal_handle.accepted:
-            self.get_logger().error('Nav2 planner rejected ComputePathToPose goal')
+            self.get_logger().error('Nav2 navigate_to_pose goal was rejected')
             return
 
-        self.get_logger().info('Nav2 planner accepted goal, waiting for result...')
+        self.get_logger().info('Goal accepted. Waiting for result...')
         result_future = goal_handle.get_result_async()
         result_future.add_done_callback(self._on_result)
 
-    def _on_compute_feedback(self, feedback_msg) -> None:
-
-
-        feedback = feedback_msg.feedback
-        self.get_logger().info(f"Navigating... Distance remaining:{feedback.distance_remaining:.2f} m", throttle_duration_sec=5.0)
-        
-
-
     def _on_result(self, future) -> None:
         try:
-            result = future.result().result
-
-
-            status = future.result().status
+            res = future.result()
+            status = res.status
+            result = res.result
         except Exception as e:
             self.get_logger().error(f"Nav2 navigation result failed: {e}")
             return
 
-        if status == rclpy.action.GoalStatus.STATUS_SUCCEEDED:
+        if status == GoalStatus.STATUS_SUCCEEDED:
             self.get_logger().info(f"Navigation Succeeded! (Result: {result})")
         else:
-            self.get_logger().warn(f"Navigation Failed with status: {status}")
-
-        
-        
-
-       
-
+            self.get_logger().warning(f"Navigation Failed with status: {status}")
 
 
 def main(args=None) -> None:

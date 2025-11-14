@@ -81,7 +81,7 @@ def generate_launch_description() -> LaunchDescription:
                     "map_server",
                     "amcl",
                     "planner_server",
-                    "control_server",
+                    "controller_server",
                     "bt_navigator",
                     "behavior_server",
                 ],
