@@ -127,14 +127,6 @@
 └─ dolchair.rviz
 ```
 
-## 향후 로드맵
-- 장애물 회피 연동(로컬/전역 플래너 보강, 동적 재계획)
-- 장소 저장/관리(서비스/GUI) 및 사용자 교정 워크플로우
-- LLM 의존도 축소(온디바이스 명령 파서/룰 기반 보완)
-- 음성 파이프라인 안정화(VAD/노이즈 처리/디바이스 관리)
-- 브리지/아두이노 파라미터 자동 보정(스케일/지연/속도한계)
-- 통합 launch/bringup 패키지화, 로깅/리플레이 도구
-- 테스트/시뮬레이션(RViz/Navi2) 및 CI 파이프라인 정비
 
 ## 참고/인용
 - rf2o_laser_odometry, slam_toolbox, robot_localization, nav2(map_server, amcl)
