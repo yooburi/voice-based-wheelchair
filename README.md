@@ -54,9 +54,13 @@
      ```
   2) tf발행, rviz, slam, localization(AMCL), EKF(엔코더+imu)가 TF발행 실행+ **2d pose estimate 해줘야 함**
      ```
+     ```
      1.맵파일 생성시 slam=True(localizaition 작동 X)
+     ```
      ros2 launch nav2_wheel wheelchair.launch.py slam=True
+     ```
      2.Localization
+     ```
      ros2 launch nav2_wheel wheelchair.launch.py 
      ```
   3) 음성 파이프라인(명령 처리)
