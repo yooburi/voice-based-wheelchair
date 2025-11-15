@@ -22,16 +22,15 @@
   - `path_planner/make_pathnplan`: 현재 위치 → 라벨 좌표(Path 생성, `/plan`)
   - `path_planner/path_follower`: 정렬(스핀) → 순수추종(Pure Pursuit) 주행, `/turn_dir`+`/auto_steer`+`/cmd_vel` 발행, 마커 시각화
 - 저수준 구동 브리지
-  - `motor_bridge`: 시리얼로 아두이노와 통신, 좌우 바퀴 rps 명령 전송
-  - 스핀 모드(`/turn_dir`)와 조향각(`/auto_steer`)·속도(`/cmd_vel`) 처리, 타임아웃/스타트업 지연 등 안전장치
+  - `MD_motor_drive : /cmd_vel > RPM으로 변환 후 모터 제어, 엔코더 > /odom 토픽으로 변환
 - 로컬라이제이션/SLAM
   - LiDAR 오도메트리(rf2o) + EKF(robot_localization) + AMCL
   - 맵 생성/저장(slam_toolbox) 및 맵 서버 연동
   - TF: `map → odom → base_link → {laser_frame, imu_link}`
 - 설정/리소스
-  - 장소 라벨: `config/location/location.yaml`
-  - 맵 파일: `config/maps/*.yaml|*.pgm`
-  - URDF: `src/2D_LiDAR/wheelchair_slam_bringup/urdf/rplidar_myahrs.urdf`
+  - 장소 라벨: `nav2_wheel/location/location.yaml`
+  - 맵 파일: `nav2_wheel/maps/*.yaml|*.pgm`
+  - URDF: `src/nav2_wheel/urdf/model.xacro`
 
 ## Usage
 - 빌드/셋업
@@ -45,33 +44,22 @@
     export OPENAI_API_KEY=your_api_key
     ```
 - 권장 실행 순서
-  1) 정적 TF/URDF
+  
      ```
-     ros2 run robot_state_publisher robot_state_publisher   --ros-args --params-file src/2D_LiDAR/wheelchair_slam_bringup/urdf/params.yaml
-     ```
-  2) 센서 드라이버
+  1) 센서 드라이버
      ```
      ros2 launch sllidar_ros2 view_sllidar_a2m8_launch.py
-     ros2 launch wheelchair_slam_bringup rs_camera.launch.py
      ros2 launch myahrs_ros2_driver myahrs_ros2_driver.launch.py
      ros2 launch imu_preprocess imu_preprocess.launch.py
      ```
-  3) LiDAR 오도메트리(rf2o)
-     - EKF를 함께 쓰면 `publish_tf:=false` 권장
+  2) tf발행, rviz, slam, localization(AMCL), EKF(엔코더+imu)가 TF발행 실행+ **2d pose estimate 해줘야 함**
      ```
-     ros2 launch rf2o_laser_odometry rf2o_laser_odometry.launch.py
+     1.맵파일 생성시 slam=True(localizaition 작동 X)
+     ros2 launch nav2_wheel wheelchair.launch.py slam=True
+     2.Localization
+     ros2 launch nav2_wheel wheelchair.launch.py 
      ```
-  4) EKF(robot_localization)
-     ```
-     ros2 run robot_localization ekf_node \
-       --ros-args -r __node:=ekf_filter_node \
-       --params-file src/2D_LiDAR/wheelchair_slam_bringup/config/ekf_odom.yaml
-     ```
-  5) 맵 로드 & 로컬라이제이션(AMCL) 자동 / path 생성 노드 실행 + rviz2 dolchair.rviz + **2d pose estimate 해줘야 함**
-     ```
-     ros2 launch wheelchair_slam_bringup nav2_planner_only.launch.py  map:=/home/yoo/workspace/dolchair_ws/config/maps/gongA_map.yaml  params_file:=/home/yoo/workspace/dolchair_ws/src/2D_LiDAR/wheelchair_slam_bringup/config/nav2_params_planner.yaml
-     ```
-  6) 음성 파이프라인(명령 처리)
+  3) 음성 파이프라인(명령 처리)
      ```
      ros2 run voice2text voice2text
      ros2 run llm_ros filter_input_text
@@ -79,20 +67,16 @@
      ros2 run llm_ros location_command
      ros2 run llm_ros llm_node
      ```
-  7) 경로 생성 & 주행
+  4) 경로 생성 & 주행
      ```
      ros2 run path_planner make_pathnplan
      ros2 run path_planner path_follower
      ```
 - SLAM(맵 생성/저장)
   ```
-  ros2 launch slam_toolbox online_async_launch.py \
-    slam_params_file:=$PWD/src/2D_LiDAR/wheelchair_slam_bringup/config/slam.yaml
-
-  ros2 run nav2_map_server map_saver_cli -f ./config/maps/dolbang_map
+  ros2 run nav2_map_server map_saver_cli -f ~/src/nav2_wheel/maps
   ```
-  - EKF 없이 맵 생성만: rf2o `publish_tf:=true`
-  - EKF와 함께: rf2o `publish_tf:=false`, EKF가 `odom→base_link` TF 단일 발행
+
 - 토픽 테스트 예시
   ```
   ros2 topic pub /target_location std_msgs/msg/String "{data: '화장실'}"
