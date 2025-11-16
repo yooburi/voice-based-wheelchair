@@ -82,19 +82,7 @@ pip-wheel-metadata/
 **/trace/
 **/*.ctf
 
-########################################
-# 맵/SLAM/내비게이션 산출물(필요 시만 추적)
-########################################
-# nav2 지도 산출물
-**/maps/**/*.pgm
-**/maps/**/*.yaml
-**/maps/**/*.png
-# occupancy/grid 저장 등
-**/maps/**/map*.*
-# cartographer, slam_toolbox 등 중간파일
-**/slam_temp/
-**/trajectory_nodes/
-**/submaps/
+
 
 ########################################
 # RViz / 시각화 캐시

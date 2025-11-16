@@ -79,7 +79,7 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
-        'map', default_value=os.path.join(bringup_dir, 'maps', 'GongHall_map.yaml'),
+        'map', default_value=os.path.join(bringup_dir, 'maps', 'gongA_map.yaml'),
         description='Full path to map file to load'
     )
 
