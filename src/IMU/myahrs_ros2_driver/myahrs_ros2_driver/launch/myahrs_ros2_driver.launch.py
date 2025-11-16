@@ -54,7 +54,7 @@ def generate_launch_description():
             executable='myahrs_ros2_driver',
             name='myahrs_ros2_driver',
             output='screen',
-            arguments=['/dev/ttyACM0', '115200'],
+            arguments=['/dev/ttyACM1', '115200'],
             parameters=[config_file]
         ),
         declare_rviz_config_file_cmd,

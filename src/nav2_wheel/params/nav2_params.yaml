@@ -194,7 +194,7 @@ local_costmap:
         mark_threshold: 2
         observation_sources: depth_cloud
         depth_cloud:
-          topic: /camera/points
+          topic: /camera/camera/depth/color/points
           data_type: PointCloud2
           max_obstacle_height: 2.0
           min_obstacle_height: 0.01
@@ -271,15 +271,15 @@ controller_server:
       vx_std: 0.2
       vy_std: 0.2
       wz_std: 0.4
-      vx_max: 0.7
+      vx_max: 1.5
       vx_min: 0.0
       vy_max: 0.0
-      wz_max: 1.0
-      ax_max: 0.7
-      ax_min: -0.7
+      wz_max: 2.59
+      ax_max: 1.0
+      ax_min: -1.0
       ay_min: 0.0
       ay_max: 0.0
-      az_max: 0.7
+      az_max: 1.5
       iteration_count: 1
       prune_distance: 1.7
       transform_tolerance: 0.1

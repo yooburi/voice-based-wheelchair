@@ -215,8 +215,7 @@
         <child link="camera_right_ir_optical_frame" />
         <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
     </joint>
-    <xacro:include filename="gazebo.xacro"/>
-    <xacro:include filename="lidar.xacro"/>
+    
 
 
 </robot>

@@ -165,8 +165,8 @@ int main(int argc, char *argv[]) {
                         byCntCase[byCntComStep] = 0;
 
                         if(SendCmdRpm) {
-                            left_iData = Short2Byte(left_rpm_ * Motor.GearRatio);
-                            right_iData = Short2Byte(right_rpm_ * Motor.GearRatio);
+                            left_iData = Short2Byte(left_rpm_ * 4.33);
+                            right_iData = Short2Byte(right_rpm_ *4.33);
 
                             nArray[0] = 1;
                             nArray[1] = left_iData.byLow;

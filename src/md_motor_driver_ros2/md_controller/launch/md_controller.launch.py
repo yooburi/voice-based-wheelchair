@@ -26,12 +26,12 @@ def generate_launch_description():
     parameters=[{
       "MDUI":184,
       "MDT":183,
-      "Port":"/dev/ttyMotor",
+      "Port":"/dev/ttyACM0",
       "Baudrate":57600,
       "ID":1,
       "GearRatio":4,
       "poles":20,
-      "wheel_radius": 0.2,
+      "wheel_radius": 0.1,
       "wheel_base": 0.4
     }],
     output='screen'

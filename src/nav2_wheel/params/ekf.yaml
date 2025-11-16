@@ -1,6 +1,6 @@
 ekf_node:
   ros__parameters:
-    use_sim_time: True # 시뮬레이션 사용 여부 (Heo님은 True)
+    use_sim_time: False # 시뮬레이션 사용 여부 (Heo님은 True)
     
     # 1. EKF 기본 설정
     frequency: 30.0                # EKF 업데이트 주기 (Hz). 컨트롤러 주기와 맞추거나 높게 설정
@@ -28,7 +28,7 @@ ekf_node:
     odom0_differential: false      # 오도메트리가 속도가 아닌 위치 변화량으로 들어오면 true
 
     # 4. 센서 입력 설정 (IMU)
-    imu0: /imu_plugin/out
+    imu0: /imu/processed
                 # 👈 IMU가 발행하는 토픽 이름
     imu0_config:
       # [X, Y, Z, Roll, Pitch, Yaw, 
