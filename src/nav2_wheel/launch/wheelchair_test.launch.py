@@ -11,7 +11,7 @@ def generate_launch_description():
     share_dir = get_package_share_directory(pkg_name)
 
     # URDF/Xacro 파일 경로 설정
-    urdf_file_name = 'model_gazebo.xacro' # <-- 이전에 'model.urdf.xacro' 오류가 났으니, 실제 파일 이름으로 변경
+    urdf_file_name = 'model.xacro' # <-- 이전에 'model.urdf.xacro' 오류가 났으니, 실제 파일 이름으로 변경
     urdf_path = os.path.join(share_dir, 'urdf', urdf_file_name)
 
     # 런치 인자 선언
@@ -54,13 +54,7 @@ def generate_launch_description():
         name='joint_state_publisher',
         condition=IfCondition(LaunchConfiguration('use_jsp'))
     )
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        arguments=['-d', os.path.join(get_package_share_directory(pkg_name), 'rviz', 'config.rviz')], # <-- Rviz 설정 파일 경로 (예시)
-        parameters=[{'use_sim_time': True}]
-    )
+   
 
     return LaunchDescription([
         use_sim_time_arg,

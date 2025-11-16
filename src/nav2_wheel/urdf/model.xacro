@@ -41,17 +41,17 @@
         <visual>
             <origin xyz="0 0 0"/>
             <geometry>
-                <cylinder radius="0.3" length="0.11"/>
+                <cylinder radius="0.1" length="0.11"/>
             </geometry>
             <material name="blue"/>
         </visual>
         <collision>
             <origin xyz="0 0 0"/>
             <geometry>
-                <cylinder radius="0.3" length="0.11"/>
+                <cylinder radius="0.1" length="0.11"/>
             </geometry>
         </collision>
-        <xacro:inertial_cylinder mass="0.5" length="0.11" radius="0.3">
+        <xacro:inertial_cylinder mass="0.5" length="0.11" radius="0.1">
             <origin xyz="0 0 0" rpy="0 0 0"/>
         </xacro:inertial_cylinder>
     </link>
@@ -59,7 +59,7 @@
     <joint name="left_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="wheel_left"/>
-        <origin xyz="-0.2 0.28 0.0395" rpy="1.57 0 0" />
+        <origin xyz="0.2 0.28 0" rpy="1.57 0 0" />
         <axis xyz="0 0 1"/>
     </joint>
 
@@ -67,17 +67,17 @@
         <visual>
             <origin xyz="0 0 0"/>
             <geometry>
-                <cylinder radius="0.3" length="0.11"/>
+                <cylinder radius="0.1" length="0.11"/>
             </geometry>
             <material name="blue"/>
         </visual>
         <collision>
             <origin xyz="0 0 0"/>
             <geometry>
-                <cylinder radius="0.3" length="0.11"/>
+                <cylinder radius="0.1" length="0.11"/>
             </geometry>
         </collision>
-        <xacro:inertial_cylinder mass="0.5" length="0.11" radius="0.3">
+        <xacro:inertial_cylinder mass="0.5" length="0.11" radius="0.1">
             <origin xyz="0 0 0" rpy="0 0 0"/>
         </xacro:inertial_cylinder>
     </link>
@@ -85,7 +85,7 @@
     <joint name="right_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="wheel_right"/>
-        <origin xyz="-0.2 -0.28 0.0395" rpy="1.57 0 0" />
+        <origin xyz="0.2 -0.28 0" rpy="1.57 0 0" />
         <axis xyz="0 0 1"/>
     </joint>
 
@@ -109,7 +109,7 @@
     <joint name="caster_wheel_joint" type="fixed">
         <parent link="base_link"/>
         <child link="caster_wheel"/>
-        <origin xyz="0.2 0 0"/>
+        <origin xyz="-0.2 0 0"/>
     </joint>
 
 
