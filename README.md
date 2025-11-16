@@ -32,50 +32,42 @@
   - 맵 파일: `nav2_wheel/maps/*.yaml|*.pgm`
   - URDF: `src/nav2_wheel/urdf/model.xacro`
 
-## Usage
-- 빌드/셋업
-  - 워크스페이스 루트에서:
-    ```
-    colcon build --symlink-install
-    source install/setup.bash
-    ```
-  - OpenAI API 키(LLM 사용 시):
-    ```
-    export OPENAI_API_KEY=your_api_key
-    ```
 - 권장 실행 순서
-  
-     ```
   1) 센서 드라이버
      ```
+     # 개별 실행
      ros2 launch sllidar_ros2 view_sllidar_a2m8_launch.py
+     ros2 launch wheelchair_slam_bringup rs_camera.launch.py
      ros2 launch myahrs_ros2_driver myahrs_ros2_driver.launch.py
      ros2 launch imu_preprocess imu_preprocess.launch.py
      ```
+
+     ```
+     # 센서 일괄 실행 
+
+     ros2 launch wheelchair_slam_bringup sensors_bringup.launch.py imu_use_rviz:=false
+     ```
+
   2) tf발행, rviz, slam, localization(AMCL), EKF(엔코더+imu)가 TF발행 실행+ **2d pose estimate 해줘야 함**
-     ```
-     ```
+   
      1.맵파일 생성시 slam=True(localizaition 작동 X)
      ```
-     ros2 launch nav2_wheel wheelchair.launch.py slam=True
+     ros2 launch nav2_wheel wheelchair.launch.py slam:=True
      ```
      2.Localization
      ```
      ros2 launch nav2_wheel wheelchair.launch.py 
      ```
+     
   3) 음성 파이프라인(명령 처리)
-     ```
-     ros2 run voice2text voice2text
-     ros2 run llm_ros filter_input_text
-     ros2 run llm_ros intent_router
-     ros2 run llm_ros location_command
-     ros2 run llm_ros llm_node
-     ```
-  4) 경로 생성 & 주행
-     ```
-     ros2 run path_planner make_pathnplan
-     ros2 run path_planner path_follower
-     ```
+      ```
+      ros2 run llm_ros wake_word_detector
+      ros2 run voice2text voice2text
+      ros2 run llm_ros intent_router
+      ros2 run llm_ros location_command
+      ros2 run llm_ros llm_node
+      ```
+
 - SLAM(맵 생성/저장)
   ```
   ros2 run nav2_map_server map_saver_cli -f ~/src/nav2_wheel/maps
@@ -92,47 +84,6 @@
   - Python: `openai`, `openai-whisper`, `torch`, `sounddevice`, `scipy`, `numpy`, `PyYAML`, `tf2_ros`
   - 하드웨어: 2D LiDAR(A2M8 등), myAHRS+, 마이크, 아두이노(시리얼 `/dev/ttyACM0` 기본)
 
-## 구조
-```
-.
-├─ config/
-│  ├─ location/location.yaml           # 장소 라벨 좌표
-│  └─ maps/*.yaml, *.pgm               # 맵 리소스
-├─ src/
-│  ├─ voice2text/                      # STT 노드
-│  │  └─ voice2text/voice2text.py
-│  ├─ llm_ros/                         # LLM/라우팅
-│  │  └─ llm_ros/
-│  │     ├─ filter_input_text.py
-│  │     ├─ intent_router.py
-│  │     ├─ location_command.py
-│  │     └─ llm_node.py
-│  ├─ path_planner/                    # 경로 계획/추종
-│  │  └─ path_planner/
-│  │     ├─ make_pathnplan.py          # 라벨 → Path
-│  │     └─ path_follower.py           # 정렬+순수추종
-│  ├─ motor_bridge/                    # 시리얼 브리지
-│  │  └─ motor_bridge/motor_bridge_node.py
-│  ├─ 2D_LiDAR/                        # LiDAR/SLAM/URDF
-│  │  ├─ sllidar_ros2/launch/view_sllidar_a2m8_launch.py
-│  │  ├─ rf2o_laser_odometry/launch/rf2o_laser_odometry.launch.py
-│  │  └─ wheelchair_slam_bringup/
-│  │     ├─ urdf/rplidar_myahrs.urdf
-│  │     └─ config/{ekf_odom.yaml, amcl.yaml, slam.yaml}
-│  └─ IMU/
-│     ├─ myahrs_ros2_driver/...
-│     └─ imu_preprocess/launch/imu_preprocess.launch.py
-├─ Arduino/
-│  └─ WHEEL_CHAIR_SERIAL/WHEEL_CHAIR_SERIAL.ino
-└─ dolchair.rviz
-```
-
-
-## 참고/인용
-- rf2o_laser_odometry, slam_toolbox, robot_localization, nav2(map_server, amcl)
-- sllidar_ros2 (Slamtec)
-- OpenAI Whisper(STT), OpenAI API(LLM)
-- myAHRS+ ROS2 드라이버(WITHROBOT)
 
 
 test: ros2 topic pub -1 /target_location std_msgs/String
