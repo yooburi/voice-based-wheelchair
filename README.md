@@ -67,7 +67,10 @@
       ros2 run llm_ros location_command
       ros2 run llm_ros llm_node
       ```
-
+  4) MD_motor 드라이브
+     ```
+     ros2 launch md_contoller md_controller.launch.py
+     ```
 - SLAM(맵 생성/저장)
   ```
   ros2 run nav2_map_server map_saver_cli -f ~/src/nav2_wheel/maps
