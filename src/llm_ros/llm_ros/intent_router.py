@@ -13,29 +13,23 @@ DIRECTION_STOPWORDS = {
 
 MOVE_VERBS_PATTERN = r"(?:가|가자|가줘|이동|이동해|이동하|이동시켜|이동해줘)$"
 
-# 호출 단어 제거 로직
-WAKEWORD_PATTERN = re.compile(r'^\s*(도리|돌이|둘리)[야아]?[,\s]*', re.IGNORECASE)
-def _strip_wakeword(text: str) -> str:
-    return WAKEWORD_PATTERN.sub('', text, count=1).strip()
-
-
 def extract_location_command(text: str) -> Optional[str]:
     """
     주어진 텍스트에서 장소 관련 명령을 분석하여 목적지나 행동을 추출합니다.
     - 저장/삭제/목록 조회 명령을 처리합니다.
     - 목적지 이동 명령을 처리하며, 방향/위치 부사는 목적지에서 제외합니다.
     """
-    # 1. "여기를 X로 저장"
-    match = re.search(r"여기를\s*(.+?)(?:으로|로)\s*저장", text)
+    # 1. "여기는 X(이)야" -> 저장 명령
+    match = re.search(r"여기는\s*(.+?)(?:이)?야", text)
     if match:
-        return match.group(1).strip()
+        return f"save:{match.group(1).strip()}"
 
-    # 2. "장소/위치 + (저장|삭제|목록)"
-    match = re.search(r"(장소|위치)\s*(저장|삭제|목록)", text)
+    # 2. "여기를 X(으)로 저장해" -> 저장 명령
+    match = re.search(r"여기를\s*(.+?)(?:으로|로)\s*저장(?:해)?", text)
     if match:
-        return match.group(2).strip() # "저장", "삭제", "목록" 반환
+        return f"save:{match.group(1).strip()}"
 
-    # 3. "X(으)로 + 이동동사" 패턴 (사용자 로직 기반)
+    # 3. "X(으)로 가/가줘/이동해" -> 이동 명령
     match = re.search(r"(.+?)(?:으로|로)\s*" + MOVE_VERBS_PATTERN, text)
     if match:
         base = match.group(1).strip()
@@ -45,16 +39,21 @@ def extract_location_command(text: str) -> Optional[str]:
                 return None  # 방향/위치 부사어이므로 장소 명령이 아님
             if len(last_token) < 2 and len(base.split()) == 1:
                 return None  # 한 글자 목적지는 노이즈로 간주
-            return base  # 목적지 반환
+            return f"go:{base}" # 목적지 반환
 
-    # 4. 숫자 + "번" 이동
-    match = re.search(r"(\d+)\s*번", text)
-    if match and re.search(MOVE_VERBS_PATTERN, text):
-        return f"{match.group(1)}번" # "1번" 과 같이 숫자와 번을 함께 반환
+    # 4. "X번 가/가줘/이동해" -> 이동 명령
+    match = re.search(r"(\d+)\s*번\s*" + MOVE_VERBS_PATTERN, text)
+    if match:
+        return f"go:{match.group(1)}번" # "go:1번" 과 같이 숫자와 번을 함께 반환
 
-    # 5. "저장해줘" 등 간단한 저장 명령
-    if re.search(r"(저장해줘|기억해줘)", text):
-        return "저장" # "저장" 액션 반환
+    # 5. "장소/위치 목록 보여줘" -> 목록 명령
+    if re.search(r"(장소|위치)\s*목록(?: 보여줘)?", text):
+        return "list"
+
+    # 6. "장소/위치 X 삭제해" -> 삭제 명령
+    match = re.search(r"(장소|위치)\s*(.+?)\s*삭제(?:해)?", text)
+    if match:
+        return f"delete:{match.group(2).strip()}"
 
     return None
 
@@ -62,16 +61,16 @@ def extract_location_command(text: str) -> Optional[str]:
 class IntentRouter(Node):
     def __init__(self):
         super().__init__('intent_router')
-        self.sub = self.create_subscription(String, '/text_command', self.cb, 10)
+        self.sub = self.create_subscription(String, '/voice2text', self.cb, 10)
         self.pub_loc = self.create_publisher(String, '/text_to_location', 10)
         self.pub_llm = self.create_publisher(String, '/text_to_llm', 10)
         self.get_logger().info("IntentRouter started (User-logic applied).")
 
     def cb(self, msg: String):
-        # 1. 호출 단어 제거
-        cleaned_text = _strip_wakeword(msg.data)
+        # 1. 호출 단어 제거 로직은 wake_word_detector로 이동했으므로, 받은 데이터를 그대로 사용합니다.
+        cleaned_text = msg.data.strip()
         if not cleaned_text:
-            return # 호출 단어만 들어온 경우 무시
+            return # 빈 문자열인 경우 무시
 
         # 2. 장소 관련 명령어인지 확인 및 목적지 추출
         location_target = extract_location_command(cleaned_text)

@@ -141,3 +141,6 @@ GEMINI.md
 ########################################
 !docs/**/*
 !examples/**/*
+
+# Picovoice wake word model
+src/llm_ros/config/wake_word/

@@ -101,8 +101,14 @@ Example:
 prompt: "앞으로 1미터 가줘"
 returns: {{"action": "move", "params": {{"linear_speed": 0.2, "distance": 1.0, "is_forward": true}}}} 
 
-prompt: "시계 방향으로 90도 회전해줘"
+prompt: "뒤로 1미터 후진해줘"
+returns: {{"action": "move", "params": {{"linear_speed": 0.2, "distance": 1.0, "is_forward": false}}}}
+
+prompt: "우측으로 90도 회전해줘"
 returns: {{"action": "rotate", "params": {{"angular_velocity": 90.0, "is_clockwise": true}}}} 
+
+prompt: "좌측으로 45도 돌려"
+returns: {{"action": "rotate", "params": {{"angular_velocity": 45.0, "is_clockwise": false}}}} 
 
 Now process:
 prompt: "{text_command}"
