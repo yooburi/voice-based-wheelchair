@@ -91,3 +91,16 @@
 
 test: ros2 topic pub -1 /target_location std_msgs/String
   "{data: '거실'}"
+
+
+3) LiDAR 오도메트리(rf2o)
+     - EKF를 함께 쓰면 `publish_tf:=false` 권장
+     ```
+     ros2 launch rf2o_laser_odometry rf2o_laser_odometry.launch.py
+     ```
+  4) EKF(robot_localization)
+     ```
+     ros2 run robot_localization ekf_node \
+       --ros-args -r __node:=ekf_filter_node \
+       --params-file src/2D_LiDAR/wheelchair_slam_bringup/config/ekf_odom.yaml
+     ```
